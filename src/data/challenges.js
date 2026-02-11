@@ -5,6 +5,7 @@ import FileUpload, { FileUploadConfig } from '../scenarios/FileUpload';
 import CouponCode, { CouponConfig } from '../scenarios/CouponCode';
 import RoleManager, { RoleConfig } from '../scenarios/RoleManager';
 import BookingArchitect, { BookingConfig } from '../scenarios/BookingArchitect';
+import SubscriptionNexus, { SubscriptionConfig } from '../scenarios/SubscriptionNexus';
 
 /**
  * To add a new challenge:
@@ -41,6 +42,10 @@ export const challengeRegistry = {
     'booking-architect': {
         component: BookingArchitect,
         config: BookingConfig,
+    },
+    'subscription-nexus': {
+        component: SubscriptionNexus,
+        config: SubscriptionConfig,
     }
 };
 
