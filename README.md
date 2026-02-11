@@ -1,5 +1,8 @@
 # Manual QA Labs
 
+## Live Demo
+Check out the interactive application here: **[https://manual-qa-labs.vercel.app](https://manual-qa-labs.vercel.app)** (Replace with your actual Vercel URL)
+
 ## Overview
 Manual QA Labs is a sophisticated technical demonstration platform designed for Quality Assurance professionals and software engineers. The application provides a suite of interactive scenarios that simulate complex system behaviors, logic dependencies, and security vulnerabilities. It serves as an educational tool for practicing edge case identification and boundary value analysis.
 
