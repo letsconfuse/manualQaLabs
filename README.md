@@ -32,6 +32,10 @@ Evaluates state management and mathematical enforcement in a commerce context.
 A complex simulation of permission hierarchies and administrative dependency logic.
 - **Parameters Studied:** Selection of parent-child permission inheritance, privilege escalation prevention during role downgrade, and account self-lockout scenarios.
 
+### 7. The Booking Architect (Expert Logic)
+An extreme challenge focused on date-management systems and time-based constraints. 
+- **Parameters Studied:** Time paradoxes, leap year math, midnight boundary updates, locale ambiguity, and mid-stay blackout conflicts.
+
 ## Technical Architecture
 The application is built using a modern, reactive stack optimized for performance and maintainability.
 - **Frontend Framework:** React 19 (Vite)
