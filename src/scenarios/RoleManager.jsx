@@ -5,6 +5,8 @@ export const RoleConfig = {
     id: 'role-manager',
     title: 'Admin User Rights',
     description: 'Manage a system user. Permissions have dependencies (e.g., Cannot "Edit" if you cannot "View"). Find the logic gaps.',
+    type: 'validation',
+    difficulty: 'Hard',
     requirements: [
         { id: 'orphan-perm', title: 'Orphaned Permission', explanation: 'Disabling "View Users" should auto-disable "Edit Users".' },
         { id: 'role-conflict', title: 'Role Conflict', explanation: 'Interns should never have "Delete" rights, even if manually checked.' },
