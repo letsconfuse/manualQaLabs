@@ -3,7 +3,9 @@ import React, { useState } from 'react';
 export const UsernameConfig = {
     id: 'username-validator',
     title: 'The Username Validator',
-    description: 'A standard registration field. But does it handle everything correctly? Test for validation quirks and security risks.',
+    description: 'A classic registration field with hidden rules. Test for length, characters, and SQL injection.',
+    type: 'validation',
+    difficulty: 'Medium',
     requirements: [
         { id: 'empty', title: 'Empty Input', explanation: 'Required field validation is fundamental.' },
         { id: 'spaces', title: 'Leading/Trailing Spaces', explanation: 'Inputs should be trimmed, or spaces should be rejected if not allowed.' },

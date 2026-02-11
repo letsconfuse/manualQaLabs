@@ -4,7 +4,9 @@ import { Search } from 'lucide-react';
 export const SearchConfig = {
     id: 'search-box',
     title: 'The Search Box',
-    description: 'Search bars are the main entry point for attacks. Can you find the security flaws and logic gaps?',
+    description: 'A search input prone to XSS and strange queries. Break the search logic.',
+    type: 'security',
+    difficulty: 'Hard',
     requirements: [
         { id: 'empty', title: 'Empty Search', explanation: 'Clicking search with no input should be handled gracefully.' },
         { id: 'xss', title: 'XSS Attempt (<script>)', explanation: 'Injecting script tags is a common attack vector.' },

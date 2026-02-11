@@ -3,7 +3,9 @@ import React, { useState } from 'react';
 export const AgeGateConfig = {
     id: 'age-gate',
     title: 'The Age Gate',
-    description: 'A simple age verification form. Users must be 18+. Find the boundary values and invalid inputs.',
+    description: 'Test a simple age verification input. Can you find all the boundary values and invalid inputs?',
+    type: 'boundary',
+    difficulty: 'Easy',
     requirements: [
         { id: 'min-boundary', title: 'Minimum Boundary (18)', explanation: '18 is the exact threshold for allowed access.' },
         { id: 'below-min', title: 'Below Boundary (17)', explanation: '17 is the immediate value below the threshold.' },

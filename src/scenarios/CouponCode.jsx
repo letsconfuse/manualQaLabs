@@ -4,7 +4,9 @@ import { ShoppingCart, Tag } from 'lucide-react';
 export const CouponConfig = {
     id: 'coupon-code',
     title: 'The Coupon Code',
-    description: 'Apply a discount to your shopping cart. Watch out for stacking, expiry, and negative totals.',
+    description: 'Apply a discount. Test expired codes, stacking, and negative totals.',
+    type: 'validation',
+    difficulty: 'Hard',
     requirements: [
         { id: 'expired', title: 'Expired Coupon', explanation: 'Old codes should be rejected gracefully.' },
         { id: 'stacking', title: 'Coupon Stacking', explanation: 'Prevent applying the same coupon twice.' },

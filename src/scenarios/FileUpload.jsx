@@ -4,7 +4,9 @@ import { Upload, X } from 'lucide-react';
 export const FileUploadConfig = {
     id: 'file-upload',
     title: 'The File Upload',
-    description: 'A common attack vector. Upload a "profle picture" but watch out for dangerous file types and size limits.',
+    description: 'Upload a picture. Test file types, size, and double extensions.',
+    type: 'security',
+    difficulty: 'Medium',
     requirements: [
         { id: 'wrong-type', title: 'Invalid File Type (.txt/.pdf)', explanation: 'System should only accept images.' },
         { id: 'double-ext', title: 'Double Extension (.jpg.exe)', explanation: 'Classic malware disguise technique.' },

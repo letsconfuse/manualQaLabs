@@ -1,51 +1,9 @@
 import React from 'react';
 import ChallengeCard from '../components/ChallengeCard';
+import { getChallengeList } from '../data/challenges';
 
 const Home = () => {
-    const challenges = [
-        {
-            id: 'age-gate',
-            title: 'The Age Gate',
-            description: 'Test a simple age verification input. Can you find all the boundary values and invalid inputs?',
-            type: 'boundary',
-            difficulty: 'Easy',
-        },
-        {
-            id: 'username-validator',
-            title: 'The Username Validator',
-            description: 'A classic registration field with hidden rules. Test for length, characters, and SQL injection.',
-            type: 'validation',
-            difficulty: 'Medium',
-        },
-        {
-            id: 'search-box',
-            title: 'The Search Box',
-            description: 'A search input prone to XSS and strange queries. Break the search logic.',
-            type: 'security',
-            difficulty: 'Hard',
-        },
-        {
-            id: 'file-upload',
-            title: 'The File Upload',
-            description: 'Upload a picture. Test file types, size, and double extensions.',
-            type: 'security',
-            difficulty: 'Medium',
-        },
-        {
-            id: 'coupon-code',
-            title: 'The Coupon Code',
-            description: 'Apply a discount. Test expired codes, stacking, and negative totals.',
-            type: 'validation',
-            difficulty: 'Hard',
-        },
-        {
-            id: 'role-manager',
-            title: 'Admin User Rights',
-            description: 'Manage user permissions. Test parent/child dependency logic and role conflicts.',
-            type: 'validation',
-            difficulty: 'Hard',
-        },
-    ];
+    const challenges = getChallengeList();
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
