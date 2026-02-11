@@ -1,52 +1,55 @@
 # Manual QA Labs
 
-An interactive web application designed to help manual QA engineers and developers practice identifying edge cases, boundary values, and security vulnerabilities.
+## Overview
+Manual QA Labs is a sophisticated technical demonstration platform designed for Quality Assurance professionals and software engineers. The application provides a suite of interactive scenarios that simulate complex system behaviors, logic dependencies, and security vulnerabilities. It serves as an educational tool for practicing edge case identification and boundary value analysis.
 
-## 🚀 Live Demo
-**[Link will be here once deployed]**
+## Core Scenarios
 
-## 🎯 The Goal
-Most testing focuses on the "Happy Path." This project focuses on the other 80%—the weird inputs, security injection attacks, and logic dependencies that cause real-world production bugs.
+### 1. Age Verification (Boundary Value Analysis)
+The Age Gate component evaluates numeric input processing and boundary enforcement. It validates the system's ability to handle exact thresholds, immediate outliers, and invalid numeric states.
+- **Parameters Studied:** Minimum boundary enforcement, negative integers, zero-value handling, and non-numeric string rejection.
 
-## 🛠 Features
-- **6 Interactive Scenarios**:
-    - **Age Gate**: Boundary Value Analysis (17, 18, 0, Negative).
-    - **Username Validator**: Input sanitization, length, and SQLi.
-    - **Search Box**: XSS, HTML injection, and buffer overflows.
-    - **File Upload**: Double extensions, size limits, and empty files.
-    - **Coupon Code**: Logic state, stacking, and negative totals.
-    - **Role Manager**: RBAC, dependency logic, and privilege escalation.
-- **Real-time Feedback**: Dynamic logs explain *why* an input triggered a bug.
-- **Progress Tracking**: Score the tester's performance as they find hidden edge cases.
-- **Professional Dark Theme**: Built with React and Tailwind CSS v4.
+### 2. User Authentication Validation
+This scenario assesses registration input sanitization and business logic constraints.
+- **Parameters Studied:** String length constraints, whitespace handling, reserved keyword rejection, and detection of basic SQL injection patterns.
 
-## 💻 Local Setup
+### 3. Search Systems Logic
+A deep-dive into query processing and input hygiene.
+- **Parameters Studied:** Cross-Site Scripting (XSS) payload detection, HTML injection, buffer overflow simulation, and "no results" state handling.
 
-1. **Clone and Install**
-   ```bash
-   git clone <your-repo-url>
-   cd qa-edge-case-challenge
-   npm install
-   ```
+### 4. File Management and Upload Security
+An analysis of file system interaction and MIME-type validation.
+- **Parameters Studied:** Double-extension spoofing, maximum file size enforcement, zero-byte file processing, and filename length limits.
 
-2. **Run Development Server**
-   ```bash
-   npm run dev
-   ```
+### 5. Transactional Logic (Coupon System)
+Evaluates state management and mathematical enforcement in a commerce context.
+- **Parameters Studied:** Expiration date logic, discount stacking prevention, negative total mitigation, and case-insensitive string resolution.
 
-3. **Build for Production**
-   ```bash
-   npm run build
-   ```
+### 6. Role-Based Access Control (RBAC)
+A complex simulation of permission hierarchies and administrative dependency logic.
+- **Parameters Studied:** Selection of parent-child permission inheritance, privilege escalation prevention during role downgrade, and account self-lockout scenarios.
 
-## 📄 License
-This project is open-source and available under the [MIT License](LICENSE).
+## Technical Architecture
+The application is built using a modern, reactive stack optimized for performance and maintainability.
+- **Frontend Framework:** React 19 (Vite)
+- **Styling Engine:** Tailwind CSS v4
+- **Iconography:** Lucide React
+- **Routing:** React Router 7 (Data API)
 
-## 🤝 Contributing
-Found a cool edge case? Pull requests are welcome! 
-1. Create a new scenario in `src/scenarios/`.
-2. Add it to the configuration map in `src/pages/ChallengeView.jsx`.
-3. Update the `Home.jsx` listing.
+## Implementation Details
+The project utilizes a modular scenario-based architecture. Each scenario is a standalone functional component registered via a centralized configuration map. This design allows for seamless extension and scalability.
 
----
-Created with ❤️ for the QA Community.
+## Deployment Instructions
+The application is optimized for production environments and can be deployed via the following methods:
+
+### Production Build
+Execute the following command to generate optimized assets:
+```bash
+npm run build
+```
+
+### Static Hosting
+The resulting `dist/` directory is compatible with standard static hosting providers such as Vercel, Netlify, or GitHub Pages.
+
+## License
+This project is licensed under the MIT License. Detailed terms can be found in the [LICENSE](LICENSE) file.
