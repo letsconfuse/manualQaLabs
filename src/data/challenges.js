@@ -5,7 +5,23 @@ import FileUpload, { FileUploadConfig } from '../scenarios/FileUpload';
 import CouponCode, { CouponConfig } from '../scenarios/CouponCode';
 import RoleManager, { RoleConfig } from '../scenarios/RoleManager';
 import BookingArchitect, { BookingConfig } from '../scenarios/BookingArchitect';
-import SubscriptionNexus, { SubscriptionConfig } from '../scenarios/SubscriptionNexus';
+import SubscriptionNexus from '../scenarios/SubscriptionNexus';
+
+const SubscriptionConfig = {
+    id: 'subscription-nexus',
+    title: 'The Subscription Nexus',
+    description: 'Elite Level: A hyper-realistic billing console simulation. Test proration math, tax liability, and state machine integrity.',
+    type: 'logic',
+    difficulty: 'Hard',
+    requirements: [
+        { id: 'proration-precision', title: 'Mid-Month Upgrade Logic', explanation: 'Upgrade precisely on Day 15 to find the $0.01 calculation drift.' },
+        { id: 'tax-exemption-bug', title: 'Tax Hierarchy Flaw', explanation: 'Applying a manual discount to a mixed taxable/exempt basket.' },
+        { id: 'floating-point-drift', title: 'Unit Math Precision', explanation: 'Generate an invoice for exactly 131,579 units at $0.00038/unit.' },
+        { id: 'state-lockout', title: 'Grace Period Deadlock', explanation: 'Trying to cancel a subscription that is currently in a "Lapsed" state.' },
+        { id: 'orphan-dependency', title: 'Orphaned Add-on Charge', explanation: 'The "Enterprise Support" add-on remains active even if the parent plan is deleted.' },
+        { id: 'leap-year-rollover', title: 'Leap Year Cycle Drift', explanation: 'Setting the signup date to Feb 29th and simulating a monthly rollover.' }
+    ]
+};
 
 /**
  * To add a new challenge:
@@ -48,6 +64,8 @@ export const challengeRegistry = {
         config: SubscriptionConfig,
     }
 };
+
+console.log('Challenge Registry Loaded:', challengeRegistry);
 
 export const getChallengeList = () => {
     return Object.entries(challengeRegistry).map(([id, data]) => ({

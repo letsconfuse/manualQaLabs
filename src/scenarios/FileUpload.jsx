@@ -13,6 +13,8 @@ export const FileUploadConfig = {
         { id: 'large-file', title: 'File Too Large (>5MB)', explanation: 'Prevent DOS attacks or storage issues.' },
         { id: 'zero-byte', title: 'Empty File (0 bytes)', explanation: 'Files with no content can crash parsers.' },
         { id: 'long-name', title: 'Filename Too Long', explanation: 'Buffer overflow or filesystem errors.' },
+        { id: 'sqli-name', title: 'SQL Injection in Filename', explanation: 'Prevent database attacks via filenames like "test\'; DROP TABLE users;.jpg".' },
+        { id: 'xss-file', title: 'XSS Payload (SVG/HTML)', explanation: 'Prevent Cross-Site Scripting via uploaded SVG or HTML files.' },
         { id: 'valid', title: 'Valid Image', explanation: 'Standard .jpg or .png file.' },
     ]
 };
@@ -31,6 +33,21 @@ const FileUpload = ({ addLog }) => {
 
         addLog({ type: 'info', message: `Attempting to upload: "${name}" (${(size / 1024).toFixed(2)} KB)` });
 
+        // 1. SQL Injection Check
+        // Detects common SQL injection patterns in filenames
+        if (name.match(/['";]+.*(drop|select|update|delete|insert|alter|exec).*/i)) {
+            addLog({ type: 'success', message: 'CRITICAL: SQL Injection attempt detected in filename!', edgeCaseId: 'sqli-name' });
+            return;
+        }
+
+        // 2. XSS Payload Check (SVG/HTML)
+        // Checks if the file is an SVG or HTML which can carry XSS payloads
+        if (type.includes('svg') || type.includes('html') || name.match(/\.(svg|html|htm)$/i)) {
+            addLog({ type: 'success', message: 'SECURITY: XSS Risk detected (SVG/HTML upload blocked).', edgeCaseId: 'xss-file' });
+            return;
+        }
+
+        // 3. Double Extension Check
         // Mock logic for "Double Extension" since real browser file input sanitizes some things, 
         // but we can check the string name.
         if (name.match(/\.(jpg|png|gif)\.exe$/i) || name.includes('.jpg.php')) {
@@ -38,24 +55,27 @@ const FileUpload = ({ addLog }) => {
             return;
         }
 
+        // 4. Empty File Check
         // Mock "0 byte" file (simulated by checking if empty or very small)
         if (size === 0) {
             addLog({ type: 'success', message: 'Edge Case: Empty (0 byte) file.', edgeCaseId: 'zero-byte' });
             return;
         }
 
+        // 5. Large File Check
         // Mock "Large File" - let's say 5MB limit
         if (size > 5 * 1024 * 1024) {
             addLog({ type: 'success', message: 'Validation: File too large (>5MB).', edgeCaseId: 'large-file' });
             return;
         }
 
+        // 6. Long Filename Check
         if (name.length > 50) {
             addLog({ type: 'success', message: 'Edge Case: Filename exceptionally long.', edgeCaseId: 'long-name' });
             return;
         }
 
-        // Check type
+        // 7. Invalid File Type Check
         if (!type.startsWith('image/')) {
             addLog({ type: 'success', message: 'Validation: Invalid file type (Not an image).', edgeCaseId: 'wrong-type' });
             return;
@@ -63,8 +83,7 @@ const FileUpload = ({ addLog }) => {
 
         addLog({ type: 'info', message: 'Upload successful.' });
         if (type.startsWith('image/') && size > 0 && size < 5 * 1024 * 1024) {
-            // Mark as valid upload found ?? Maybe not needed for edge case list but good for completeness
-            // We can add a hidden requirement for "Valid File" if we want
+            // Valid file success
         }
     };
 
@@ -94,32 +113,6 @@ const FileUpload = ({ addLog }) => {
         }
     };
 
-    // Simulation buttons for users who don't have these specific files handy
-    const simulateUpload = (type) => {
-        let mockFile = { name: 'test.jpg', size: 1024, type: 'image/jpeg' };
-
-        switch (type) {
-            case 'exe':
-                mockFile = { name: 'vacation.jpg.exe', size: 1024, type: 'application/x-msdownload' };
-                break;
-            case 'txt':
-                mockFile = { name: 'notes.txt', size: 1024, type: 'text/plain' };
-                break;
-            case 'large':
-                mockFile = { name: 'hd-movie.mp4', size: 10 * 1024 * 1024, type: 'video/mp4' };
-                break;
-            case 'empty':
-                mockFile = { name: 'empty.jpg', size: 0, type: 'image/jpeg' };
-                break;
-            case 'long':
-                mockFile = { name: 'this_is_a_very_very_long_filename_that_might_cause_buffer_overflows_on_old_systems_123456789.jpg', size: 1024, type: 'image/jpeg' };
-                break;
-            default:
-                break;
-        }
-        handleFiles([mockFile]);
-    };
-
     return (
         <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg text-slate-900">
             <h3 className="text-xl font-bold mb-4">Upload Profile Picture</h3>
@@ -147,27 +140,6 @@ const FileUpload = ({ addLog }) => {
                 >
                     Browse Files
                 </button>
-            </div>
-
-            <div className="mt-8 border-t pt-4">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Quick Test (Simulate)</p>
-                <div className="grid grid-cols-2 gap-2">
-                    <button onClick={() => simulateUpload('exe')} className="text-xs bg-red-100 hover:bg-red-200 text-red-700 py-2 px-3 rounded border border-red-200 transition">
-                        Simulate .jpg.exe
-                    </button>
-                    <button onClick={() => simulateUpload('txt')} className="text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 py-2 px-3 rounded border border-orange-200 transition">
-                        Simulate .txt file
-                    </button>
-                    <button onClick={() => simulateUpload('large')} className="text-xs bg-yellow-100 hover:bg-yellow-200 text-yellow-700 py-2 px-3 rounded border border-yellow-200 transition">
-                        Simulate 10MB File
-                    </button>
-                    <button onClick={() => simulateUpload('empty')} className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-3 rounded border border-gray-200 transition">
-                        Simulate 0 Byte File
-                    </button>
-                    <button onClick={() => simulateUpload('long')} className="col-span-2 text-xs bg-purple-100 hover:bg-purple-200 text-purple-700 py-2 px-3 rounded border border-purple-200 transition">
-                        Simulate Long Filename
-                    </button>
-                </div>
             </div>
         </div>
     );

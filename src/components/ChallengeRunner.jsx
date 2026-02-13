@@ -123,7 +123,7 @@ const ChallengeRunner = ({
                             </div>
                         </div>
                     ) : (
-                        <div className="z-10 w-full max-w-md">
+                        <div className="z-10 w-full h-full flex flex-col items-center justify-center">
                             {/* Clone children to inject the addLog prop */}
                             {React.cloneElement(children, { addLog })}
                         </div>
