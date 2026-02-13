@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Terminal, AlertCircle, RefreshCw } from 'lucide-react';
+import { CheckCircle, XCircle, Terminal, AlertCircle, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const ChallengeRunner = ({
@@ -12,21 +12,26 @@ const ChallengeRunner = ({
     const [logs, setLogs] = useState([]);
     const [solvedCases, setSolvedCases] = useState(new Set());
     const [progress, setProgress] = useState(0);
+    const [isPanelExpanded, setIsPanelExpanded] = useState(true);
 
     // Expose a method for the child component to report results
-    const addLog = (entry) => {
+    // Expose a method for the child component to report results
+    // useCallback prevents this from changing reference on every render, which stops infinite loops in child useEffects
+    const addLog = React.useCallback((entry) => {
         // entry: { type: 'success' | 'error' | 'info', message: string, edgeCaseId: string }
         const timestamp = new Date().toLocaleTimeString();
         setLogs(prev => [{ ...entry, timestamp }, ...prev]);
 
         if (entry.edgeCaseId && entry.type === 'success') {
             setSolvedCases(prev => {
+                // Only update if not already solved (optimization)
+                if (prev.has(entry.edgeCaseId)) return prev;
                 const newSet = new Set(prev);
                 newSet.add(entry.edgeCaseId);
                 return newSet;
             });
         }
-    };
+    }, []);
 
     useEffect(() => {
         if (requirements.length > 0) {
@@ -35,70 +40,22 @@ const ChallengeRunner = ({
     }, [solvedCases, requirements.length]);
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-8 h-[calc(100vh-64px)] flex flex-col md:flex-row gap-6">
+        <div className="h-[calc(100vh-64px)] w-full bg-slate-950 flex flex-col md:flex-row overflow-hidden font-sans text-slate-300">
 
-            {/* Left Panel: Requirements & Progress */}
-            <div className="w-full md:w-1/3 h-full">
-                <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-xl h-full flex flex-col">
-                    <div className="mb-4 flex-shrink-0">
-                        <Link to="/" className="text-slate-400 hover:text-white text-sm mb-2 inline-block">&larr; Back to Challenges</Link>
-                        <h2 className="text-2xl font-bold text-white">{title}</h2>
-                        <p className="text-slate-400 text-sm mt-1">{description}</p>
-                    </div>
-
-                    <div className="mb-6 flex-shrink-0">
-                        <div className="flex justify-between text-sm mb-2">
-                            <span className="text-slate-300">Progress</span>
-                            <span className="text-primary font-bold">{progress}%</span>
-                        </div>
-                        <div className="w-full bg-slate-700 rounded-full h-2.5">
-                            <div
-                                className="bg-primary h-2.5 rounded-full transition-all duration-500"
-                                style={{ width: `${progress}%` }}
-                            ></div>
-                        </div>
-                    </div>
-
-                    <div className="flex-grow overflow-y-auto pr-2 space-y-3 custom-scrollbar">
-                        <h3 className="font-semibold text-slate-200 uppercase text-xs tracking-wider sticky top-0 bg-slate-800 pb-2 z-10">Edge Case Checklist</h3>
-                        {requirements.map((req) => (
-                            <div
-                                key={req.id}
-                                className={`flex items-start p-3 rounded-lg border transition-all ${solvedCases.has(req.id)
-                                    ? 'bg-green-500/10 border-green-500/30'
-                                    : 'bg-slate-700/30 border-slate-700/50'
-                                    }`}
-                            >
-                                <div className="mt-0.5 mr-3 flex-shrink-0">
-                                    {solvedCases.has(req.id)
-                                        ? <CheckCircle className="w-5 h-5 text-green-400" />
-                                        : <div className="w-5 h-5 rounded-full border-2 border-slate-600" />
-                                    }
-                                </div>
-                                <div>
-                                    <p className={`text-sm font-medium ${solvedCases.has(req.id) ? 'text-green-300' : 'text-slate-300'}`}>
-                                        {solvedCases.has(req.id) ? req.title : '??? (Hidden)'}
-                                    </p>
-                                    {solvedCases.has(req.id) && (
-                                        <p className="text-xs text-green-400/70 mt-1">{req.explanation}</p>
-                                    )}
-                                    {/* Hint Logic could go here */}
-                                    {!solvedCases.has(req.id) && (
-                                        <p className="text-xs text-slate-500 mt-1 italic">Find this edge case...</p>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
+            {/* LEFT PANE: Interactive App Stage */}
+            <div className="flex-grow h-full relative overflow-auto flex flex-col">
+                {/* Header / Breadcrumbs */}
+                <div className="flex-shrink-0 h-14 border-b border-slate-800 flex items-center px-6 bg-[#0b1121]">
+                    <div className="flex items-center gap-3">
+                        <Link to="/" className="text-slate-500 hover:text-white text-xs uppercase tracking-wider font-bold transition-colors">&larr; Back</Link>
+                        <div className="w-px h-4 bg-slate-800"></div>
+                        <h2 className="text-sm font-bold text-white">{title}</h2>
                     </div>
                 </div>
-            </div>
 
-            {/* Right Panel: Interactive Area & Console */}
-            <div className="w-full md:w-2/3 flex flex-col gap-6">
-
-                {/* Interactive Component Area */}
-                <div className="bg-slate-800 rounded-xl p-8 border border-slate-700 flex-grow flex flex-col items-center justify-center relative bg-grid-pattern overflow-hidden">
-                    <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                {/* Challenge Container */}
+                <div className="flex-grow relative bg-slate-950 flex flex-col items-center justify-center p-4">
+                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]"></div>
 
                     {progress === 100 ? (
                         <div className="z-20 text-center animate-bounceIn">
@@ -124,47 +81,102 @@ const ChallengeRunner = ({
                         </div>
                     ) : (
                         <div className="z-10 w-full h-full flex flex-col items-center justify-center">
-                            {/* Clone children to inject the addLog prop */}
                             {React.cloneElement(children, { addLog })}
                         </div>
                     )}
                 </div>
+            </div>
 
-                {/* Console / Logs */}
-                <div className="bg-black/80 rounded-xl border border-slate-800 h-64 flex flex-col overflow-hidden font-mono text-xs">
-                    <div className="bg-slate-900/50 p-2 border-b border-slate-800 flex justify-between items-center px-4">
-                        <span className="flex items-center text-slate-400 gap-2">
-                            <Terminal className="w-4 h-4" /> System Logs
-                        </span>
-                        <button
-                            onClick={() => setLogs([])}
-                            className="text-slate-500 hover:text-white transition-colors"
-                        >
-                            <RefreshCw className="w-3 h-3" />
-                        </button>
+            {/* RIGHT PANE: Sidebar Tools (Checklist & Console) */}
+            <div className="w-full md:w-96 flex-shrink-0 flex flex-col border-l border-slate-800 bg-[#0f172a] h-full overflow-hidden transition-all duration-300">
+
+                {/* Progress Header */}
+                <div className="flex-shrink-0 p-4 border-b border-slate-800 bg-slate-900/50">
+                    <div className="flex justify-between items-center mb-2">
+                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Progress</h3>
+                        <span className="text-primary font-mono text-xs font-bold">{progress}%</span>
                     </div>
-                    <div className="p-4 overflow-y-auto space-y-2 flex-grow">
-                        {logs.length === 0 && (
-                            <div className="text-slate-600 italic text-center mt-10">Waiting for user interactions...</div>
-                        )}
-                        {logs.map((log, index) => (
-                            <div key={index} className="flex gap-2 animate-fadeIn">
-                                <span className="text-slate-600">[{log.timestamp}]</span>
-                                <span className={`
-                  ${log.type === 'success' ? 'text-green-400' : ''}
-                  ${log.type === 'error' ? 'text-red-400' : ''}
-                  ${log.type === 'info' ? 'text-blue-300' : ''}
-                `}>
-                                    {log.type === 'success' && '✓ '}
-                                    {log.type === 'error' && '✕ '}
-                                    {log.type === 'info' && 'ℹ '}
-                                    {log.message}
-                                </span>
+                    <div className="w-full bg-slate-800 rounded-full h-1.5">
+                        <div
+                            className="bg-primary h-1.5 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"
+                            style={{ width: `${progress}%` }}
+                        ></div>
+                    </div>
+                </div>
+
+                {/* Requirements List (Scrollable) */}
+                <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                    <h3 className="font-mono font-bold text-slate-500 uppercase text-[10px] tracking-widest mb-3 flex items-center gap-2">
+                        <CheckCircle className="w-3 h-3" /> Test Cases
+                    </h3>
+                    <div className="space-y-1">
+                        {requirements.map((req) => (
+                            <div
+                                key={req.id}
+                                className={`flex items-start p-2.5 rounded-lg border text-xs transition-all ${solvedCases.has(req.id)
+                                    ? 'bg-green-500/10 border-green-500/20 text-green-300'
+                                    : 'bg-slate-800/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                                    }`}
+                            >
+                                <div className="mt-0.5 mr-3 flex-shrink-0">
+                                    {solvedCases.has(req.id)
+                                        ? <CheckCircle className="w-3.5 h-3.5 text-green-500" />
+                                        : <div className="w-3.5 h-3.5 rounded-full border border-slate-600" />
+                                    }
+                                </div>
+                                <div>
+                                    <p className="font-medium leading-relaxed">
+                                        {solvedCases.has(req.id) ? req.title : '??? (Hidden QA Case)'}
+                                    </p>
+                                    {solvedCases.has(req.id) && (
+                                        <p className="text-[10px] text-green-400/50 mt-1">{req.explanation}</p>
+                                    )}
+                                </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
+                {/* Console / Logs (Sticky Bottom Half) */}
+                <div className="flex-shrink-0 h-1/3 min-h-[200px] border-t border-slate-800 flex flex-col bg-[#050912]">
+                    <div className="flex-shrink-0 p-2 border-b border-slate-800 flex justify-between items-center px-4 bg-slate-900/30">
+                        <span className="flex items-center text-slate-400 gap-2 font-bold tracking-wider text-[10px] uppercase">
+                            <Terminal className="w-3 h-3" /> System Console
+                        </span>
+                        <button
+                            onClick={() => setLogs([])}
+                            className="text-slate-600 hover:text-white transition-colors"
+                            title="Clear Logs"
+                        >
+                            <RefreshCw className="w-3 h-3" />
+                        </button>
+                    </div>
+                    <div className="flex-1 p-3 overflow-y-auto font-mono text-xs custom-scrollbar">
+                        {logs.length === 0 && (
+                            <div className="h-full flex flex-col items-center justify-center text-slate-700 italic opacity-50">
+                                <Terminal className="w-8 h-8 mb-2 opacity-20" />
+                                <span>Ready for input...</span>
+                            </div>
+                        )}
+                        <div className="flex flex-col gap-1">
+                            {logs.map((log, index) => (
+                                <div key={index} className="flex gap-2 animate-fadeIn border-b border-white/5 pb-1 mb-1 last:border-0 last:mb-0">
+                                    <span className="text-slate-600 flex-shrink-0 select-none">[{log.timestamp}]</span>
+                                    <span className={`break-words
+                        ${log.type === 'success' ? 'text-emerald-400' : ''}
+                        ${log.type === 'error' ? 'text-red-400' : ''}
+                        ${log.type === 'info' ? 'text-blue-400' : ''}
+                        `}>
+                                        {log.type === 'success' && '✓ '}
+                                        {log.type === 'error' && '✕ '}
+                                        {log.type === 'info' && '» '}
+                                        {log.message}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
