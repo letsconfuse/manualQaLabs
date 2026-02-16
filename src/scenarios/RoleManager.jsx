@@ -100,36 +100,36 @@ const RoleManager = ({ addLog }) => {
     };
 
     return (
-        <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg text-slate-900">
-            <div className="flex justify-between items-start mb-6">
+        <div className="w-full max-w-lg bg-slate-900 border border-slate-700 p-0 rounded-xl shadow-2xl overflow-hidden">
+            <div className="bg-slate-800 p-6 border-b border-slate-700 flex justify-between items-start">
                 <div>
-                    <h3 className="text-xl font-bold flex items-center gap-2">
-                        <User className="text-primary" /> User Settings
+                    <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                        <User className="text-indigo-500" /> User Settings
                     </h3>
-                    <p className="text-xs text-slate-500">Edit permissions for: <span className="font-mono">john.doe@company.com</span></p>
+                    <p className="text-slate-400 text-xs mt-1">Edit permissions for: <span className="font-mono text-indigo-300">john.doe@company.com</span></p>
                 </div>
                 <div className="text-right">
-                    <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer">
+                    <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer text-slate-300 hover:text-white transition-colors">
                         <input
                             type="checkbox"
                             checked={active}
                             onChange={(e) => setActive(e.target.checked)}
-                            className="w-4 h-4 text-primary rounded"
+                            className="w-4 h-4 text-indigo-500 rounded border-slate-600 bg-slate-700 focus:ring-indigo-500"
                         />
                         Account Active
                     </label>
                 </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="p-6 space-y-6">
 
                 {/* Role Selector */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                    <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Role</label>
                     <select
                         value={role}
                         onChange={handleRoleChange}
-                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary outline-none"
+                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer"
                     >
                         <option value="Admin">Super Admin</option>
                         <option value="Manager">Manager</option>
@@ -140,26 +140,28 @@ const RoleManager = ({ addLog }) => {
                 </div>
 
                 {/* Permissions Grid */}
-                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                    <h4 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2"><Lock className="w-4 h-4" /> Permissions</h4>
+                <div className="bg-slate-950/50 p-5 rounded-xl border border-slate-700/50">
+                    <h4 className="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2 border-b border-slate-700 pb-2">
+                        <Lock className="w-4 h-4 text-slate-500" /> Permissions
+                    </h4>
 
                     <div className="space-y-4">
                         {/* User Module */}
                         <div>
-                            <h5 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">User Management</h5>
+                            <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-2">User Management</h5>
                             <div className="space-y-2 pl-2">
-                                <label className="flex items-center gap-3 text-sm cursor-pointer hover:bg-slate-100 p-1 rounded">
-                                    <input type="checkbox" checked={permissions.viewUsers} onChange={() => handlePermissionChange('viewUsers')} className="text-primary rounded" />
+                                <label className="flex items-center gap-3 text-sm cursor-pointer hover:bg-slate-800/50 p-2 rounded transition-colors text-slate-300">
+                                    <input type="checkbox" checked={permissions.viewUsers} onChange={() => handlePermissionChange('viewUsers')} className="text-indigo-500 rounded border-slate-600 bg-slate-800" />
                                     View Users
                                 </label>
-                                <div className="pl-6 space-y-2 border-l-2 border-slate-200 ml-1">
-                                    <label className="flex items-center gap-3 text-sm cursor-pointer hover:bg-slate-100 p-1 rounded">
-                                        <input type="checkbox" checked={permissions.editUsers} onChange={() => handlePermissionChange('editUsers')} className="text-primary rounded" />
+                                <div className="pl-6 space-y-2 border-l-2 border-slate-800 ml-1">
+                                    <label className="flex items-center gap-3 text-sm cursor-pointer hover:bg-slate-800/50 p-2 rounded transition-colors text-slate-300">
+                                        <input type="checkbox" checked={permissions.editUsers} onChange={() => handlePermissionChange('editUsers')} className="text-indigo-500 rounded border-slate-600 bg-slate-800" />
                                         Edit Users
                                     </label>
-                                    <label className="flex items-center gap-3 text-sm cursor-pointer hover:bg-slate-100 p-1 rounded">
-                                        <input type="checkbox" checked={permissions.deleteUsers} onChange={() => handlePermissionChange('deleteUsers')} className="text-red-500 rounded focus:ring-red-500" />
-                                        <span className="text-red-600">Delete Users</span>
+                                    <label className="flex items-center gap-3 text-sm cursor-pointer hover:bg-red-900/10 p-2 rounded transition-colors text-slate-300 group">
+                                        <input type="checkbox" checked={permissions.deleteUsers} onChange={() => handlePermissionChange('deleteUsers')} className="text-red-500 rounded border-slate-600 bg-slate-800 focus:ring-red-500" />
+                                        <span className="group-hover:text-red-400 transition-colors">Delete Users</span>
                                     </label>
                                 </div>
                             </div>
@@ -167,15 +169,15 @@ const RoleManager = ({ addLog }) => {
 
                         {/* Reports Module */}
                         <div>
-                            <h5 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Reports</h5>
+                            <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-2">Reports</h5>
                             <div className="space-y-2 pl-2">
-                                <label className="flex items-center gap-3 text-sm cursor-pointer hover:bg-slate-100 p-1 rounded">
-                                    <input type="checkbox" checked={permissions.viewReports} onChange={() => handlePermissionChange('viewReports')} className="text-primary rounded" />
+                                <label className="flex items-center gap-3 text-sm cursor-pointer hover:bg-slate-800/50 p-2 rounded transition-colors text-slate-300">
+                                    <input type="checkbox" checked={permissions.viewReports} onChange={() => handlePermissionChange('viewReports')} className="text-indigo-500 rounded border-slate-600 bg-slate-800" />
                                     View Reports
                                 </label>
-                                <div className="pl-6 border-l-2 border-slate-200 ml-1">
-                                    <label className="flex items-center gap-3 text-sm cursor-pointer hover:bg-slate-100 p-1 rounded">
-                                        <input type="checkbox" checked={permissions.exportReports} onChange={() => handlePermissionChange('exportReports')} className="text-primary rounded" />
+                                <div className="pl-6 border-l-2 border-slate-800 ml-1">
+                                    <label className="flex items-center gap-3 text-sm cursor-pointer hover:bg-slate-800/50 p-2 rounded transition-colors text-slate-300">
+                                        <input type="checkbox" checked={permissions.exportReports} onChange={() => handlePermissionChange('exportReports')} className="text-indigo-500 rounded border-slate-600 bg-slate-800" />
                                         Export Reports
                                     </label>
                                 </div>
@@ -186,7 +188,7 @@ const RoleManager = ({ addLog }) => {
 
                 <button
                     onClick={handleSave}
-                    className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded transition-colors shadow-lg"
+                    className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-4 rounded-lg transition-all shadow-lg border border-slate-700 hover:border-slate-600 active:scale-[0.98]"
                 >
                     Save Changes
                 </button>

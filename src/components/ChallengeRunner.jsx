@@ -47,7 +47,7 @@ const ChallengeRunner = ({
                 {/* Header / Breadcrumbs */}
                 <div className="flex-shrink-0 h-14 border-b border-slate-800 flex items-center px-6 bg-[#0b1121]">
                     <div className="flex items-center gap-3">
-                        <Link to="/" className="text-slate-500 hover:text-white text-xs uppercase tracking-wider font-bold transition-colors">&larr; Back</Link>
+                        <Link to="/" className="text-slate-400 hover:text-white text-xs uppercase tracking-wider font-bold transition-colors">&larr; Back</Link>
                         <div className="w-px h-4 bg-slate-800"></div>
                         <h2 className="text-sm font-bold text-white">{title}</h2>
                     </div>
@@ -98,7 +98,7 @@ const ChallengeRunner = ({
                     </div>
                     <div className="w-full bg-slate-800 rounded-full h-1.5">
                         <div
-                            className="bg-primary h-1.5 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"
+                            className="bg-indigo-500 h-1.5 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]"
                             style={{ width: `${progress}%` }}
                         ></div>
                     </div>
@@ -106,7 +106,7 @@ const ChallengeRunner = ({
 
                 {/* Requirements List (Scrollable) */}
                 <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                    <h3 className="font-mono font-bold text-slate-500 uppercase text-[10px] tracking-widest mb-3 flex items-center gap-2">
+                    <h3 className="font-mono font-bold text-slate-400 uppercase text-[10px] tracking-widest mb-3 flex items-center gap-2">
                         <CheckCircle className="w-3 h-3" /> Test Cases
                     </h3>
                     <div className="space-y-1">
@@ -129,7 +129,7 @@ const ChallengeRunner = ({
                                         {solvedCases.has(req.id) ? req.title : '??? (Hidden QA Case)'}
                                     </p>
                                     {solvedCases.has(req.id) && (
-                                        <p className="text-[10px] text-green-400/50 mt-1">{req.explanation}</p>
+                                        <p className="text-[10px] text-green-400/90 mt-1">{req.explanation}</p>
                                     )}
                                 </div>
                             </div>
@@ -153,7 +153,7 @@ const ChallengeRunner = ({
                     </div>
                     <div className="flex-1 p-3 overflow-y-auto font-mono text-xs custom-scrollbar">
                         {logs.length === 0 && (
-                            <div className="h-full flex flex-col items-center justify-center text-slate-700 italic opacity-50">
+                            <div className="h-full flex flex-col items-center justify-center text-slate-500 italic opacity-50">
                                 <Terminal className="w-8 h-8 mb-2 opacity-20" />
                                 <span>Ready for input...</span>
                             </div>
@@ -161,7 +161,7 @@ const ChallengeRunner = ({
                         <div className="flex flex-col gap-1">
                             {logs.map((log, index) => (
                                 <div key={index} className="flex gap-2 animate-fadeIn border-b border-white/5 pb-1 mb-1 last:border-0 last:mb-0">
-                                    <span className="text-slate-600 flex-shrink-0 select-none">[{log.timestamp}]</span>
+                                    <span className="text-slate-500 flex-shrink-0 select-none">[{log.timestamp}]</span>
                                     <span className={`break-words
                         ${log.type === 'success' ? 'text-emerald-400' : ''}
                         ${log.type === 'error' ? 'text-red-400' : ''}

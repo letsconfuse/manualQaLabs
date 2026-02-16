@@ -122,53 +122,62 @@ const BookingArchitect = ({ addLog }) => {
     };
 
     return (
-        <div className="w-full max-w-sm bg-white p-6 rounded-lg shadow-lg text-slate-900">
-            <h3 className="text-xl font-bold mb-4">Elite Booking Engine</h3>
-            <p className="text-xs text-slate-500 mb-4">*Note: System uses YYYY-MM-DD format, but accepts manual manipulation.</p>
-            <form onSubmit={handleBooking} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wider">Check-in</label>
-                        <input
-                            type="text"
-                            className="w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                            placeholder="YYYY-MM-DD"
-                            value={checkIn}
-                            onChange={(e) => setCheckIn(e.target.value)}
-                        />
+        <div className="w-full max-w-sm bg-slate-900 border border-slate-700 p-0 rounded-xl shadow-2xl overflow-hidden">
+            <div className="bg-slate-800 p-6 border-b border-slate-700">
+                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <span className="text-2xl">📅</span> Elite Booking Engine
+                </h3>
+                <p className="text-slate-400 text-xs mt-1">Reserve your stay... if time permits.</p>
+            </div>
+
+            <div className="p-6 space-y-6">
+                <p className="text-xs text-slate-500 font-mono text-center mb-2">*System Format: YYYY-MM-DD*</p>
+                <form onSubmit={handleBooking} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Check-in</label>
+                            <input
+                                type="text"
+                                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
+                                placeholder="YYYY-MM-DD"
+                                value={checkIn}
+                                onChange={(e) => setCheckIn(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Check-out</label>
+                            <input
+                                type="text"
+                                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
+                                placeholder="YYYY-MM-DD"
+                                value={checkOut}
+                                onChange={(e) => setCheckOut(e.target.value)}
+                            />
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wider">Check-out</label>
-                        <input
-                            type="text"
-                            className="w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                            placeholder="YYYY-MM-DD"
-                            value={checkOut}
-                            onChange={(e) => setCheckOut(e.target.value)}
-                        />
+
+                    <div className="p-3 bg-slate-800/50 border border-slate-700/50 rounded-lg text-[10px] text-slate-400 italic flex gap-2 items-center">
+                        <span className="text-lg">⚠️</span>
+                        Developer Note: Maintenance scheduled for Dec 24-26, 2026.
                     </div>
-                </div>
 
-                <div className="p-3 bg-slate-100 rounded text-[10px] text-slate-500 italic">
-                    Developer Note: Maintenance scheduled for Dec 24-26, 2026.
-                </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-slate-100 hover:bg-white text-slate-900 font-bold py-3 rounded-lg transition-all uppercase tracking-widest text-xs shadow-lg shadow-white/5 active:scale-[0.98]"
+                    >
+                        Confirm Reservation
+                    </button>
+                </form>
 
-                <button
-                    type="submit"
-                    className="w-full bg-slate-900 hover:bg-black text-white font-bold py-2 rounded transition-colors uppercase tracking-widest text-xs"
-                >
-                    Confirm Reservation
-                </button>
-            </form>
-
-            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-around opacity-50">
-                <div className="text-center">
-                    <span className="block font-bold text-xs">Total</span>
-                    <span className="text-xs text-primary">$ --</span>
-                </div>
-                <div className="text-center">
-                    <span className="block font-bold text-xs">Tax</span>
-                    <span className="text-xs text-primary">$ --</span>
+                <div className="pt-4 border-t border-slate-800 flex justify-around opacity-50">
+                    <div className="text-center">
+                        <span className="block font-bold text-xs text-slate-500">Total</span>
+                        <span className="text-xs text-indigo-400 font-mono">$ --</span>
+                    </div>
+                    <div className="text-center">
+                        <span className="block font-bold text-xs text-slate-500">Tax</span>
+                        <span className="text-xs text-indigo-400 font-mono">$ --</span>
+                    </div>
                 </div>
             </div>
         </div>

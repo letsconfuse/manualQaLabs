@@ -59,30 +59,40 @@ const UsernameValidator = ({ addLog }) => {
         if (username.length >= 3 && username.length <= 20 && /^[a-zA-Z0-9]+$/.test(username.trim()) && username.toLowerCase() !== 'admin') {
             addLog({ type: 'info', message: 'Username appears valid.' });
         }
+
+        setUsername('');
     };
 
     return (
-        <div className="w-full max-w-sm bg-white p-6 rounded-lg shadow-lg text-slate-900">
-            <h3 className="text-xl font-bold mb-4">Create Username</h3>
-            <form onSubmit={handleCheck} className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                    <input
-                        type="text"
-                        className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all"
-                        placeholder="Username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">3-20 characters, alphanumeric only.</p>
-                </div>
-                <button
-                    type="submit"
-                    className="w-full bg-secondary hover:bg-secondary/90 text-white font-bold py-2 px-4 rounded transition-colors"
-                >
-                    Check Availability
-                </button>
-            </form>
+        <div className="w-full max-w-sm bg-slate-900 border border-slate-700 p-0 rounded-xl shadow-2xl overflow-hidden">
+            <div className="bg-slate-800 p-6 border-b border-slate-700">
+                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <span className="text-2xl">👤</span> Create Username
+                </h3>
+                <p className="text-slate-400 text-xs mt-1">Claim your unique digital identity.</p>
+            </div>
+
+            <div className="p-6 space-y-6">
+                <form onSubmit={handleCheck} className="space-y-4">
+                    <div className="space-y-2">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Username</label>
+                        <input
+                            type="text"
+                            className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono text-lg"
+                            placeholder="e.g. user_123"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                        <p className="text-xs text-slate-500">3-20 characters, alphanumeric only.</p>
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-lg transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 active:scale-[0.98]"
+                    >
+                        Check Availability
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };

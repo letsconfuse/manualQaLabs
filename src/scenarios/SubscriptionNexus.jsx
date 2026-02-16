@@ -169,25 +169,25 @@ const SubscriptionNexus = ({ addLog }) => {
                     <aside className="w-64 shrink-0 bg-slate-900/50 backdrop-blur-xl border-r border-slate-800 flex flex-col p-4">
                         <div className="flex items-center gap-3 mb-6 text-emerald-400">
                             <Database className="w-6 h-6" />
-                            <span className="font-bold tracking-wider text-sm">BILLING<span className="text-slate-500">OS</span></span>
+                            <span className="font-bold tracking-wider text-sm">BILLING<span className="text-slate-400">OS</span></span>
                         </div>
 
                         <div className="space-y-4 flex-1">
                             <div className="space-y-2">
-                                <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Tenant</label>
+                                <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tenant</label>
                                 <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
                                     <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400">
                                         <Activity className="w-4 h-4" />
                                     </div>
                                     <div>
                                         <div className="text-xs font-medium text-slate-200">Acme Corp</div>
-                                        <div className="text-[10px] text-slate-500">ID: 992-882-11</div>
+                                        <div className="text-[10px] text-slate-400">ID: 992-882-11</div>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">System Date</label>
+                                <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">System Date</label>
                                 <div className="relative">
                                     <input
                                         type="text"
@@ -200,7 +200,7 @@ const SubscriptionNexus = ({ addLog }) => {
                             </div>
 
                             <div className="pt-6 border-t border-slate-800">
-                                <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-2 block">Account Status</label>
+                                <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-2 block">Account Status</label>
                                 <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold border ${status === 'Lapsed' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>
                                     <div className={`w-1.5 h-1.5 rounded-full ${status === 'Lapsed' ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`} />
                                     {status.toUpperCase()}
@@ -208,7 +208,7 @@ const SubscriptionNexus = ({ addLog }) => {
                             </div>
                         </div>
 
-                        <div className="text-[10px] text-slate-600 font-mono text-center">
+                        <div className="text-[10px] text-slate-500 font-mono text-center">
                             v4.2.1-stable
                         </div>
                     </aside>
@@ -232,7 +232,7 @@ const SubscriptionNexus = ({ addLog }) => {
 
                         {/* Plan Selection */}
                         <section className="mb-6">
-                            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Core Plan</h3>
+                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Core Plan</h3>
                             <div className="grid grid-cols-3 gap-4">
                                 {['Basic', 'Pro', 'Enterprise'].map(p => {
                                     const isSelected = plan === p;
@@ -248,7 +248,7 @@ const SubscriptionNexus = ({ addLog }) => {
                                             <h4 className={`text-sm font-medium mb-1 ${isSelected ? 'text-white' : 'text-slate-300'}`}>{p}</h4>
                                             <div className="text-2xl font-light text-slate-200 mb-4">
                                                 ${p === 'Enterprise' ? '500' : p === 'Pro' ? '100' : '20'}
-                                                <span className="text-xs text-slate-500 font-normal">/mo</span>
+                                                <span className="text-xs text-slate-400 font-normal">/mo</span>
                                             </div>
                                             <ul className="space-y-1">
                                                 {[1, 2].map(i => (
@@ -266,7 +266,7 @@ const SubscriptionNexus = ({ addLog }) => {
 
                         {/* Addons */}
                         <section className="mb-6">
-                            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Expansion Modules</h3>
+                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Expansion Modules</h3>
                             <div className="grid grid-cols-1 gap-3">
                                 {addons.map(addon => (
                                     <div key={addon.id} className="flex items-center justify-between p-4 rounded-xl bg-slate-800/20 border border-slate-700/30 hover:border-slate-600/50 transition-all">
@@ -300,16 +300,16 @@ const SubscriptionNexus = ({ addLog }) => {
 
                         {/* Metered Usage */}
                         <section className="mb-6">
-                            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Usage Metering</h3>
+                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Usage Metering</h3>
                             <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/30">
                                 <div className="flex justify-between items-end mb-4">
                                     <div>
                                         <div className="text-sm text-slate-300 font-medium mb-1">API Calls</div>
-                                        <div className="text-xs text-slate-500">Rate: ${unitPrice} per call</div>
+                                        <div className="text-xs text-slate-400">Rate: ${unitPrice} per call</div>
                                     </div>
                                     <div className="text-right">
                                         <div className="text-2xl font-mono text-white tracking-tight">{unitInput}</div>
-                                        <div className="text-[10px] text-slate-500 text-right">UNITS</div>
+                                        <div className="text-[10px] text-slate-400 text-right">UNITS</div>
                                     </div>
                                 </div>
                                 <div className="relative h-2 bg-slate-800 rounded-full overflow-hidden mb-4">
@@ -365,7 +365,7 @@ const SubscriptionNexus = ({ addLog }) => {
 
                         <div className="flex-1 overflow-y-auto">
                             <div className="space-y-3 text-xs">
-                                <div className="flex justify-between border-b pb-2 mb-2 font-bold text-slate-400 uppercase tracking-wider text-[10px]">
+                                <div className="flex justify-between border-b pb-2 mb-2 font-bold text-slate-500 uppercase tracking-wider text-[10px]">
                                     <span>Item</span>
                                     <span>Cost</span>
                                 </div>
@@ -421,7 +421,7 @@ const SubscriptionNexus = ({ addLog }) => {
                             <button className="w-full py-3 bg-slate-900 text-white rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-slate-800 transition-all flex items-center justify-center gap-2">
                                 <Download className="w-4 h-4" /> Download PDF
                             </button>
-                            <p className="text-[9px] text-center text-slate-400 mt-4 leading-normal">
+                            <p className="text-[9px] text-center text-slate-500 mt-4 leading-normal">
                                 Payment due within 30 days. Late fees apply for amounts over $1,000.
                             </p>
                         </footer>

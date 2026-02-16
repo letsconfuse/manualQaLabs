@@ -37,6 +37,7 @@ const AgeGate = ({ addLog }) => {
 
         if (isNaN(num)) {
             addLog({ type: 'success', message: 'Reproduced bug: System accepts text but fails logic.', edgeCaseId: 'non-numeric' });
+            setInputValue('');
             return;
         }
 
@@ -57,34 +58,44 @@ const AgeGate = ({ addLog }) => {
         } else {
             // Normal behaviors
             if (num > 18) {
-                addLog({ type: 'info', message: 'Standard valid input.' });
             } else {
                 addLog({ type: 'info', message: 'Standard invalid input.' });
             }
         }
+
+        // UX: Clear input for next test
+        setInputValue('');
     };
 
     return (
-        <div className="w-full max-w-sm bg-white p-6 rounded-lg shadow-lg text-slate-900">
-            <h3 className="text-xl font-bold mb-4">Verify Your Age</h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Enter Age</label>
-                    <input
-                        type="text"
-                        className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                        placeholder="e.g. 21"
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                    />
-                </div>
-                <button
-                    type="submit"
-                    className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4 rounded transition-colors"
-                >
-                    Verify
-                </button>
-            </form>
+        <div className="w-full max-w-sm bg-slate-900 border border-slate-700 p-0 rounded-xl shadow-2xl overflow-hidden">
+            <div className="bg-slate-800 p-6 border-b border-slate-700">
+                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <span className="text-2xl">🔞</span> Verify Your Age
+                </h3>
+                <p className="text-slate-400 text-xs mt-1">Access restricted to authorized personnel.</p>
+            </div>
+
+            <div className="p-6 space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Enter Age</label>
+                        <input
+                            type="text"
+                            className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-mono text-lg"
+                            placeholder="e.g. 21"
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-lg transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 active:scale-[0.98]"
+                    >
+                        Verify Access
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };

@@ -86,42 +86,44 @@ const CouponCode = ({ addLog }) => {
     };
 
     return (
-        <div className="w-full max-w-sm bg-white p-6 rounded-lg shadow-lg text-slate-900">
-            <div className="flex justify-between items-center mb-6 border-b pb-4">
-                <h3 className="text-xl font-bold flex items-center gap-2">
-                    <ShoppingCart className="text-primary" /> Cart
+        <div className="w-full max-w-sm bg-slate-900 border border-slate-700 p-0 rounded-xl shadow-2xl overflow-hidden">
+            <div className="bg-slate-800 p-6 border-b border-slate-700 flex justify-between items-center">
+                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <ShoppingCart className="text-indigo-500" /> Cart
                 </h3>
                 <div className="text-right">
-                    <p className="text-xs text-gray-500">Total</p>
-                    <p className="text-2xl font-bold text-slate-800">${cartTotal.toFixed(2)}</p>
+                    <p className="text-xs text-slate-400">Total</p>
+                    <p className="text-2xl font-bold text-white">${cartTotal.toFixed(2)}</p>
                 </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="p-6 space-y-6">
                 <form onSubmit={handleApply} className="flex gap-2">
                     <input
                         type="text"
-                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary outline-none"
+                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono"
                         placeholder="Promo Code"
                         value={couponInput}
                         onChange={(e) => setCouponInput(e.target.value)}
                     />
                     <button
                         type="submit"
-                        className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded transition-colors whitespace-nowrap"
+                        className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg border border-slate-700 transition-colors whitespace-nowrap active:scale-[0.98]"
                     >
                         Apply
                     </button>
                 </form>
 
-                <div className="bg-slate-50 p-3 rounded text-xs space-y-1 border border-slate-100">
-                    <p className="font-semibold text-gray-500 mb-1">Available Codes (Hidden Hints):</p>
-                    <p className="font-mono text-slate-600">SAVE10 <span className="text-gray-400">($10 off)</span></p>
-                    <p className="font-mono text-slate-600">SUMMER2020 <span className="text-gray-400">(Expired)</span></p>
-                    <p className="font-mono text-slate-600">MEGA1000 <span className="text-gray-400">($1000 off)</span></p>
+                <div className="bg-slate-800/50 p-4 rounded-lg text-xs space-y-2 border border-slate-700/50">
+                    <p className="font-bold text-slate-400 uppercase tracking-wider mb-2">Available Codes (Hidden Hints):</p>
+                    <div className="flex flex-col gap-1">
+                        <p className="font-mono text-emerald-400">SAVE10 <span className="text-slate-500">($10 off)</span></p>
+                        <p className="font-mono text-slate-500 line-through decoration-slate-600">SUMMER2020 <span className="text-slate-600">(Expired)</span></p>
+                        <p className="font-mono text-purple-400">MEGA1000 <span className="text-slate-500">($1000 off)</span></p>
+                    </div>
                 </div>
 
-                <button onClick={resetCart} className="w-full text-xs text-gray-400 hover:text-gray-600 underline">
+                <button onClick={resetCart} className="w-full text-xs text-slate-500 hover:text-slate-300 transition-colors underline decoration-slate-700 hover:decoration-slate-400">
                     Reset Cart
                 </button>
             </div>
