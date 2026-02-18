@@ -69,7 +69,7 @@ const ChallengeRunner = ({
     }, [solvedCases, requirements.length, progress]);
 
     return (
-        <div className="h-[calc(100vh-64px)] w-full bg-body flex flex-col md:flex-row overflow-hidden font-sans text-secondary-color">
+        <div className="h-auto md:h-[calc(100vh-64px)] w-full bg-body flex flex-col md:flex-row overflow-visible md:overflow-hidden font-sans text-secondary-color rounded-2xl md:rounded-l-2xl shadow-sm border border-theme">
 
             {/* LEFT PANE: Interactive App Stage */}
             <div className="flex-grow h-full relative overflow-auto flex flex-col">
@@ -142,7 +142,7 @@ const ChallengeRunner = ({
             </div>
 
             {/* RIGHT PANE: Sidebar Tools (Checklist & Console) */}
-            <div className="w-full md:w-96 flex-shrink-0 flex flex-col border-l border-theme bg-surface h-full overflow-hidden transition-all duration-300 shadow-xl z-20">
+            <div className="w-full md:w-96 flex-shrink-0 flex flex-col border-t md:border-t-0 md:border-l border-theme bg-surface h-auto md:h-full overflow-hidden transition-all duration-300 shadow-xl z-20 rounded-b-2xl md:rounded-b-none md:rounded-r-2xl">
 
                 {/* Progress Header */}
                 <div className="flex-shrink-0 p-4 border-b border-theme bg-body">
