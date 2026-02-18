@@ -76,7 +76,7 @@ const ChallengeRunner = ({
                 {/* Header / Breadcrumbs */}
                 <div className="flex-shrink-0 h-14 border-b border-theme flex items-center px-6 bg-surface">
                     <div className="flex items-center gap-3">
-                        <Link to="/" className="text-secondary-color hover:text-primary-color text-xs uppercase tracking-wider font-bold transition-colors">&larr; Back</Link>
+                        <Link to="/challenges" className="text-secondary-color hover:text-primary-color text-xs uppercase tracking-wider font-bold transition-colors">&larr; Back</Link>
                         <div className="w-px h-4 bg-theme"></div>
                         <h2 className="text-sm font-bold text-primary-color">{title}</h2>
                     </div>

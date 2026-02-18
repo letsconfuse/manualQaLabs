@@ -1,10 +1,11 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import { Home, Info, Trophy, Shield, Moon, Sun } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 const Sidebar = () => {
     const { theme, toggleTheme } = useTheme();
+    const location = useLocation();
 
     const navItems = [
         { icon: Home, label: 'Home', path: '/' },
@@ -15,14 +16,14 @@ const Sidebar = () => {
     return (
         <aside className="fixed left-4 top-4 bottom-4 w-20 md:w-64 bg-surface/95 backdrop-blur-xl border border-theme rounded-2xl shadow-3d flex flex-col z-50 transition-all duration-300">
             {/* Logo Area */}
-            <div className="h-20 flex items-center justify-center md:justify-start md:px-6 border-b border-theme/50">
-                <div className="p-2 bg-accent-primary/10 rounded-xl">
+            <Link to="/" className="h-20 flex items-center justify-center md:justify-start md:px-6 border-b border-theme/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                <div className="p-2 bg-accent-primary/10 rounded-xl transition-transform">
                     <Shield className="w-8 h-8 text-accent drop-shadow-md" />
                 </div>
                 <span className="hidden md:block ml-3 font-black text-xl tracking-tight text-primary-color">
                     QA<span className="text-accent">LABS</span>
                 </span>
-            </div>
+            </Link>
 
             {/* Navigation */}
             <nav className="flex-1 py-8 flex flex-col space-y-2 px-4">
@@ -30,14 +31,15 @@ const Sidebar = () => {
                     <NavLink
                         key={item.path}
                         to={item.path}
-                        className={({ isActive }) =>
-                            `flex items-center justify-center md:justify-start px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
+                        className={({ isActive }) => {
+                            const isPathActive = isActive || (item.path === '/challenges' && location.pathname.startsWith('/challenge'));
+                            return `flex items-center justify-center md:justify-start px-4 py-3 rounded-xl transition-all duration-200 group ${isPathActive
                                 ? 'bg-accent-primary text-white shadow-lg shadow-teal-500/30 translate-x-1'
                                 : 'text-secondary-color hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white hover:translate-x-1'
-                            }`
-                        }
+                                }`
+                        }}
                     >
-                        <item.icon className={`w-5 h-5 ${item.label === 'Challenges' ? '' : ''}`} />
+                        <item.icon className="w-5 h-5" />
                         <span className="hidden md:block ml-3 text-sm font-bold">
                             {item.label}
                         </span>
