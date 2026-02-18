@@ -31,6 +31,23 @@
   <meta property="twitter:description"
     content="Sharpen your QA skills with realistic, buggy scenarios designed to test your attention to detail." />
   <meta property="twitter:image" content="https://manual-qa-labs.vercel.app/og-image.png" />
+  <!-- Theme Initialization Script -->
+  <script>
+    (function () {
+      try {
+        const localTheme = localStorage.getItem('theme');
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (localTheme === 'dark' || (!localTheme && supportDarkMode)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('light'); // Optional, but good for consistency
+        }
+      } catch (e) {
+        console.error('Theme initialization failed:', e);
+      }
+    })();
+  </script>
 </head>
 
 <body>

@@ -19,82 +19,149 @@ export const AgeGateConfig = {
 
 const AgeGate = ({ addLog }) => {
     const [inputValue, setInputValue] = useState('');
+    const [status, setStatus] = useState('LOCKED'); // LOCKED, GRANTED, DENIED
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    // Keyboard support
+    React.useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (status !== 'LOCKED') return;
 
-        // Check specific edge cases
-        const num = Number(inputValue);
-        const isInt = Number.isInteger(num);
+            // Allow standard inputs for testing edge cases (negatives, decimals, text)
+            if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                handlePress(e.key);
+            } else if (e.key === 'Enter') {
+                checkAge();
+            } else if (e.key === 'Backspace' || e.key === 'Delete') {
+                setInputValue(prev => prev.slice(0, -1));
+            } else if (e.key === 'Escape' || e.key.toLowerCase() === 'c') {
+                setInputValue('');
+            }
+        };
 
-        // Log interaction
-        addLog({ type: 'info', message: `User submitted: "${inputValue}"` });
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [status, inputValue]);
 
-        if (inputValue === '') {
-            addLog({ type: 'error', message: 'Input is empty.', edgeCaseId: 'empty' });
+    const handlePress = (val) => {
+        if (status !== 'LOCKED') return; // Freeze input if status is set
+
+        if (val === 'ENTER') {
+            checkAge();
             return;
         }
 
-        if (isNaN(num)) {
-            addLog({ type: 'success', message: 'Reproduced bug: System accepts text but fails logic.', edgeCaseId: 'non-numeric' });
+        if (val === 'C') {
             setInputValue('');
             return;
         }
 
-        if (inputValue.includes('.')) {
-            addLog({ type: 'success', message: 'Edge case found: Decimal age.', edgeCaseId: 'decimal' });
-        }
+        // Max 5 chars to allow testing "-100" or "18.5"
+        setInputValue(prev => {
+            if (prev.length < 5) return prev + val;
+            return prev;
+        });
+    };
 
-        if (num < 0) {
-            addLog({ type: 'success', message: 'Edge case found: Negative age.', edgeCaseId: 'negative' });
+    const checkAge = () => {
+        const num = Number(inputValue);
+        addLog({ type: 'info', message: `Verifying identity age: "${inputValue}"` });
+
+        let granted = false;
+
+        if (inputValue === '') {
+            addLog({ type: 'error', message: 'Identity missing.', edgeCaseId: 'empty' });
+        } else if (isNaN(num)) {
+            // Hard to do with keypad, but maybe if they paste? 
+            // Logic kept for consistency if we allow keyboard input via hidden input
+            addLog({ type: 'success', message: 'Syntax Error in Identity.', edgeCaseId: 'non-numeric' });
+            setStatus('DENIED');
+        } else if (inputValue.includes('.')) {
+            addLog({ type: 'success', message: 'Decimal age detected.', edgeCaseId: 'decimal' });
+            setStatus('DENIED');
+        } else if (num < 0) {
+            addLog({ type: 'success', message: 'Temporal Anomaly (Negative Age).', edgeCaseId: 'negative' });
+            setStatus('DENIED');
         } else if (num === 0) {
-            addLog({ type: 'success', message: 'Edge case found: Age is 0.', edgeCaseId: 'zero' });
+            addLog({ type: 'success', message: 'Age Zero.', edgeCaseId: 'zero' });
+            setStatus('DENIED');
         } else if (num === 17) {
-            addLog({ type: 'success', message: 'Boundary found: 17 (Just below limit).', edgeCaseId: 'below-min' });
+            addLog({ type: 'success', message: 'Boundary: Underage (17).', edgeCaseId: 'below-min' });
+            setStatus('DENIED');
         } else if (num === 18) {
-            addLog({ type: 'success', message: 'Boundary found: 18 (Exact limit).', edgeCaseId: 'min-boundary' });
+            addLog({ type: 'success', message: 'Boundary: Minimum Age (18). Access Granted.', edgeCaseId: 'min-boundary' });
+            granted = true;
+            setStatus('GRANTED');
         } else if (num > 120) {
-            addLog({ type: 'success', message: 'Edge case found: Unrealistic age.', edgeCaseId: 'upper-boundary' });
+            addLog({ type: 'success', message: 'Biological Impossibility (>120).', edgeCaseId: 'upper-boundary' });
+            setStatus('DENIED');
+        } else if (num > 18) {
+            granted = true;
+            setStatus('GRANTED');
         } else {
-            // Normal behaviors
-            if (num > 18) {
-            } else {
-                addLog({ type: 'info', message: 'Standard invalid input.' });
-            }
+            setStatus('DENIED');
         }
 
-        // UX: Clear input for next test
-        setInputValue('');
+        // Reset after delay
+        setTimeout(() => {
+            setInputValue('');
+            setStatus('LOCKED');
+        }, 2000);
     };
 
     return (
-        <div className="w-full max-w-sm bg-slate-900 border border-slate-700 p-0 rounded-xl shadow-2xl overflow-hidden">
-            <div className="bg-slate-800 p-6 border-b border-slate-700">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    <span className="text-2xl">🔞</span> Verify Your Age
-                </h3>
-                <p className="text-slate-400 text-xs mt-1">Access restricted to authorized personnel.</p>
+        <div className="w-full max-w-sm bg-surface border-4 border-theme p-6 rounded-3xl shadow-3d overflow-hidden relative transition-colors">
+            {/* Screws */}
+            <div className="absolute top-4 left-4 w-3 h-3 rounded-full bg-theme flex items-center justify-center"><div className="w-full h-[1px] bg-secondary-color rotate-45"></div></div>
+            <div className="absolute top-4 right-4 w-3 h-3 rounded-full bg-theme flex items-center justify-center"><div className="w-full h-[1px] bg-secondary-color rotate-45"></div></div>
+            <div className="absolute bottom-4 left-4 w-3 h-3 rounded-full bg-theme flex items-center justify-center"><div className="w-full h-[1px] bg-secondary-color rotate-45"></div></div>
+            <div className="absolute bottom-4 right-4 w-3 h-3 rounded-full bg-theme flex items-center justify-center"><div className="w-full h-[1px] bg-secondary-color rotate-45"></div></div>
+
+            <div className="bg-body p-4 rounded-2xl border-b-2 border-theme mb-6 text-center transition-colors">
+                <div className="text-[10px] text-secondary-color uppercase tracking-[0.2em] mb-1">Security Level 5</div>
+                <h3 className="text-2xl font-black text-primary-color">AGE GATE</h3>
             </div>
 
-            <div className="p-6 space-y-6">
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Enter Age</label>
-                        <input
-                            type="text"
-                            className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-mono text-lg"
-                            placeholder="e.g. 21"
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                        />
-                    </div>
+            {/* Display */}
+            <div className={`mb-6 p-4 rounded-2xl font-mono text-3xl text-center tracking-widest border-2 transition-colors shadow-[inset_0_2px_10px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] ${status === 'GRANTED' ? 'bg-emerald-100 dark:bg-emerald-900/50 border-emerald-500 text-emerald-600 dark:text-emerald-400' :
+                status === 'DENIED' ? 'bg-rose-100 dark:bg-red-900/50 border-red-500 text-red-600 dark:text-red-500' :
+                    'bg-body border-theme text-primary-color'
+                }`}>
+                {status !== 'LOCKED' ? status : (inputValue || '___')}
+            </div>
+
+            {/* Keypad */}
+            <div className="grid grid-cols-3 gap-3 mb-4">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
                     <button
-                        type="submit"
-                        className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-lg transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 active:scale-[0.98]"
+                        key={num}
+                        onClick={() => handlePress(num.toString())}
+                        className="h-14 rounded-xl bg-surface text-primary-color border-b-4 border-theme font-bold text-xl active:border-b-0 active:translate-y-[4px] transition-all hover:bg-body"
                     >
-                        Verify Access
+                        {num}
                     </button>
-                </form>
+                ))}
+                <button
+                    onClick={() => handlePress('C')}
+                    className="h-14 rounded-xl bg-rose-50 dark:bg-red-900/30 text-rose-600 dark:text-red-400 border-b-4 border-rose-200 dark:border-red-900/50 font-bold text-lg active:border-b-0 active:translate-y-[4px] transition-all hover:bg-rose-100 dark:hover:bg-red-900/50"
+                >
+                    CLR
+                </button>
+                <button
+                    onClick={() => handlePress('0')}
+                    className="h-14 rounded-xl bg-surface text-primary-color border-b-4 border-theme font-bold text-xl active:border-b-0 active:translate-y-[4px] transition-all hover:bg-body"
+                >
+                    0
+                </button>
+                <button
+                    onClick={() => handlePress('ENTER')}
+                    className="h-14 rounded-xl bg-emerald-500 dark:bg-emerald-600 text-white border-b-4 border-emerald-700 dark:border-emerald-800 font-bold text-lg active:border-b-0 active:translate-y-[4px] transition-all hover:bg-emerald-400 dark:hover:bg-emerald-500"
+                >
+                    ENT
+                </button>
+            </div>
+
+            <div className="text-center">
+                <div className={`inline-block w-2 h-2 rounded-full mb-1 ${status === 'LOCKED' ? 'bg-amber-500 animate-pulse' : 'bg-slate-400 dark:bg-slate-600'}`}></div>
             </div>
         </div>
     );

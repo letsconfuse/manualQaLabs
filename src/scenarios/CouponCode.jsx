@@ -21,6 +21,7 @@ const CouponCode = ({ addLog }) => {
     const [cartTotal, setCartTotal] = useState(100);
     const [couponInput, setCouponInput] = useState('');
     const [appliedCoupons, setAppliedCoupons] = useState([]);
+    const [discounts, setDiscounts] = useState([]); // { code, amount }
 
     const handleApply = (e) => {
         e.preventDefault();
@@ -33,8 +34,6 @@ const CouponCode = ({ addLog }) => {
 
         // Check Case Sensitivity Edge Case
         if (code !== upperCode && (upperCode === 'SAVE10' || upperCode === 'VIP50')) {
-            // If they typed lowercase but it worked, that's a pass for case sensitivity check really,
-            // but let's explicity log it if they tried lowercase.
             addLog({ type: 'success', message: 'UX: Case sensitivity tested.', edgeCaseId: 'case' });
         }
 
@@ -58,75 +57,115 @@ const CouponCode = ({ addLog }) => {
         } else if (upperCode === 'VIP50') {
             applyDiscount(50, 'VIP50');
         } else if (upperCode === 'MEGA1000') {
-            // Mock a huge discount to test negative total
             if (cartTotal - 1000 < 0) {
                 addLog({ type: 'success', message: 'Logic: Discount exceeds total (Negative Price).', edgeCaseId: 'negative' });
-                setCartTotal(0); // Cap at 0 for UI
+                // We allow negative visually for the "Receipt" effect to look broken
+                applyDiscount(1000, 'MEGA1000');
             } else {
                 applyDiscount(1000, 'MEGA1000');
             }
         } else {
             addLog({ type: 'info', message: 'Invalid coupon code.' });
-            // Could map to 'invalid' requirement if we strictly track it
         }
 
         setCouponInput('');
     };
 
     const applyDiscount = (amount, code) => {
-        setCartTotal(prev => Math.max(0, prev - amount));
+        setCartTotal(prev => prev - amount);
         setAppliedCoupons(prev => [...prev, code]);
+        setDiscounts(prev => [...prev, { code, amount }]);
         addLog({ type: 'info', message: `Coupon ${code} applied. -$${amount}` });
     };
 
     const resetCart = () => {
         setCartTotal(100);
         setAppliedCoupons([]);
+        setDiscounts([]);
         addLog({ type: 'info', message: 'Cart reset.' });
     };
 
     return (
-        <div className="w-full max-w-sm bg-slate-900 border border-slate-700 p-0 rounded-xl shadow-2xl overflow-hidden">
-            <div className="bg-slate-800 p-6 border-b border-slate-700 flex justify-between items-center">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    <ShoppingCart className="text-indigo-500" /> Cart
-                </h3>
-                <div className="text-right">
-                    <p className="text-xs text-slate-400">Total</p>
-                    <p className="text-2xl font-bold text-white">${cartTotal.toFixed(2)}</p>
-                </div>
+        <div className="w-full max-w-sm relative group font-mono text-xs">
+            {/* Receipt jagged top */}
+            <div className="h-4 bg-white relative">
+                <div className="absolute top-0 left-0 w-full h-full" style={{ background: 'linear-gradient(135deg, transparent 75%, #f1f5f9 75%) -10px 0, linear-gradient(225deg, transparent 75%, #f1f5f9 75%) -10px 0', backgroundSize: '20px 20px', backgroundRepeat: 'repeat-x' }}></div>
+                <div className="absolute bottom-0 left-0 w-full h-full" style={{ background: 'linear-gradient(45deg, transparent 75%, #f8fafc 75%) -10px 0, linear-gradient(-45deg, transparent 75%, #f8fafc 75%) -10px 0', backgroundSize: '20px 20px', backgroundRepeat: 'repeat-x' }}></div>
             </div>
 
-            <div className="p-6 space-y-6">
-                <form onSubmit={handleApply} className="flex gap-2">
-                    <input
-                        type="text"
-                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono"
-                        placeholder="Promo Code"
-                        value={couponInput}
-                        onChange={(e) => setCouponInput(e.target.value)}
-                    />
-                    <button
-                        type="submit"
-                        className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg border border-slate-700 transition-colors whitespace-nowrap active:scale-[0.98]"
-                    >
-                        Apply
-                    </button>
-                </form>
+            <div className="bg-surface text-primary-color p-6 shadow-xl relative filter drop-shadow-md">
+                {/* Receipt Header */}
+                <div className="text-center mb-6 border-b-2 border-dashed border-theme pb-4">
+                    <h3 className="text-2xl font-black uppercase tracking-widest mb-1">STORE_RCPT</h3>
+                    <div className="text-[10px] text-secondary-color">TERMINAL #442-B • {new Date().toLocaleTimeString()}</div>
+                </div>
 
-                <div className="bg-slate-800/50 p-4 rounded-lg text-xs space-y-2 border border-slate-700/50">
-                    <p className="font-bold text-slate-400 uppercase tracking-wider mb-2">Available Codes (Hidden Hints):</p>
-                    <div className="flex flex-col gap-1">
-                        <p className="font-mono text-emerald-400">SAVE10 <span className="text-slate-500">($10 off)</span></p>
-                        <p className="font-mono text-slate-500 line-through decoration-slate-600">SUMMER2020 <span className="text-slate-600">(Expired)</span></p>
-                        <p className="font-mono text-purple-400">MEGA1000 <span className="text-slate-500">($1000 off)</span></p>
+                {/* Items */}
+                <div className="space-y-2 mb-4">
+                    <div className="flex justify-between">
+                        <span>ITEM_01: PREMIUM_PLAN</span>
+                        <span className="font-bold">$100.00</span>
+                    </div>
+                    <div className="flex justify-between text-secondary-color">
+                        <span>   QTY: 1 @ 100.00</span>
                     </div>
                 </div>
 
-                <button onClick={resetCart} className="w-full text-xs text-slate-500 hover:text-slate-300 transition-colors underline decoration-slate-700 hover:decoration-slate-400">
-                    Reset Cart
-                </button>
+                {/* Applied Discounts */}
+                {discounts.length > 0 && (
+                    <div className="space-y-2 mb-4 border-t border-dashed border-theme pt-2">
+                        {discounts.map((d, i) => (
+                            <div key={i} className="flex justify-between text-red-600">
+                                <span>VOUCHER: {d.code}</span>
+                                <span>-${d.amount.toFixed(2)}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Total */}
+                <div className="border-t-2 border-primary-color pt-4 mb-6">
+                    <div className="flex justify-between text-lg font-black">
+                        <span>TOTAL</span>
+                        <span>${cartTotal.toFixed(2)}</span>
+                    </div>
+                    {cartTotal < 0 && (
+                        <div className="text-center mt-2 bg-red-100 text-red-600 p-1 font-bold">
+                            ⚠️ CREDIT OWED
+                        </div>
+                    )}
+                </div>
+
+                {/* Coupon Input */}
+                <form onSubmit={handleApply} className="bg-body/50 p-2 rounded border border-theme mb-4">
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            className="w-full bg-surface border border-theme px-2 py-1 outline-none uppercase placeholder-secondary-color text-primary-color"
+                            placeholder="ENTER_CODE"
+                            value={couponInput}
+                            onChange={(e) => setCouponInput(e.target.value)}
+                        />
+                        <button type="submit" className="bg-primary-color text-surface px-3 font-bold hover:bg-secondary-color transition-colors">Apply</button>
+                    </div>
+                </form>
+
+                {/* Reset */}
+                <div className="text-center border-t border-dashed border-slate-300 pt-4">
+                    <button onClick={resetCart} className="text-[10px] underline hover:text-red-500">VOID TRANSACTION</button>
+                    <div className="mt-4 text-[10px] opacity-50 barcode font-libre-barcode text-3xl overflow-hidden whitespace-nowrap">
+                        1234567891011121314
+                    </div>
+                </div>
             </div>
+
+            {/* Jagged Bottom */}
+            <div className="h-4 bg-transparent relative -mt-[1px]">
+                <div className="w-full h-full" style={{ background: 'linear-gradient(135deg, #f8fafc 75%, transparent 75%) -10px 0, linear-gradient(225deg, #f8fafc 75%, transparent 75%) -10px 0', backgroundSize: '20px 20px', backgroundRepeat: 'repeat-x' }}></div>
+            </div>
+
+            {/* Paper Texture Overlay */}
+            <div className="absolute inset-0 bg-[#fffdf5] opacity-10 mix-blend-overlay pointer-events-none"></div>
         </div>
     );
 };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { User } from 'lucide-react';
 
 export const UsernameConfig = {
     id: 'username-validator',
@@ -19,80 +20,148 @@ export const UsernameConfig = {
 
 const UsernameValidator = ({ addLog }) => {
     const [username, setUsername] = useState('');
+    const [checks, setChecks] = useState({
+        length: false,
+        chars: false,
+        audit: false,
+        unique: false
+    });
+    const [status, setStatus] = useState('IDLE'); // IDLE, SCANNING, VALID, INVALID
 
-    const handleCheck = (e) => {
-        e.preventDefault();
-
-        addLog({ type: 'info', message: `Checking username: "${username}"` });
-
-        if (!username) {
-            addLog({ type: 'error', message: 'Username is empty.', edgeCaseId: 'empty' });
-            return;
-        }
-
-        // specific SQLi patterns
-        const sqliPatterns = ["' OR '1'='1", "' OR 1=1", "--", "; DROP TABLE"];
-        if (sqliPatterns.some(p => username.toUpperCase().includes(p.toUpperCase()))) {
-            addLog({ type: 'success', message: 'Security Alert: SQL Injection pattern detected!', edgeCaseId: 'sqli' });
-            return;
-        }
-
-        if (username.startsWith(' ') || username.endsWith(' ')) {
-            addLog({ type: 'success', message: 'Edge case: Input has un-trimmed whitespace.', edgeCaseId: 'spaces' });
-        }
-
-        if (username.length < 3) {
-            addLog({ type: 'success', message: 'Validation: Username too short.', edgeCaseId: 'short' });
-        } else if (username.length > 20) {
-            addLog({ type: 'success', message: 'Validation: Username too long.', edgeCaseId: 'long' });
-        }
-
-        if (/[^a-zA-Z0-9 ]/.test(username)) {
-            addLog({ type: 'success', message: 'Validation: Contains special characters.', edgeCaseId: 'special' });
-        }
-
-        if (username.toLowerCase() === 'admin') {
-            addLog({ type: 'success', message: 'Business Logic: Restricted username.', edgeCaseId: 'admin' });
-        }
-
-        // Use a slightly different logic for "success" feedback for valid inputs
-        if (username.length >= 3 && username.length <= 20 && /^[a-zA-Z0-9]+$/.test(username.trim()) && username.toLowerCase() !== 'admin') {
-            addLog({ type: 'info', message: 'Username appears valid.' });
-        }
-
-        setUsername('');
+    const handleInput = (e) => {
+        const val = e.target.value;
+        setUsername(val);
+        validate(val);
     };
 
+    const validate = (val) => {
+        const newChecks = {
+            length: val.length >= 3 && val.length <= 20,
+            chars: /^[a-zA-Z0-9_]+$/.test(val),
+            audit: !val.toLowerCase().includes('admin') && !val.toLowerCase().includes('null'),
+            unique: val !== 'testUser' // Mock DB check
+        };
+        setChecks(newChecks);
+
+        // Edge Case Logging (Debounced slightly in real world, but here generic)
+        if (val.includes(' ')) {
+            addLog({ type: 'success', message: 'Whitespace detected: Spaces are not allowed.', edgeCaseId: 'spaces' });
+        }
+        if (val.length > 20) {
+            addLog({ type: 'success', message: 'Buffer limit exceeded (>20 chars).', edgeCaseId: 'long' });
+        }
+        if (val.includes("'") || val.includes('"')) {
+            addLog({ type: 'success', message: 'Security Alert: SQL Injection characters detected.', edgeCaseId: 'sqli' });
+        }
+    };
+
+    const handleScan = () => {
+        if (!username) return;
+        setStatus('SCANNING');
+        addLog({ type: 'info', message: `Initiating identity scan for: ${username}` });
+
+        setTimeout(() => {
+            const allPassed = Object.values(checks).every(c => c);
+            if (allPassed) {
+                setStatus('VALID');
+                addLog({ type: 'info', message: 'Identity verified. Access generated.' });
+            } else {
+                setStatus('INVALID');
+                addLog({ type: 'error', message: 'Identity verification failed.' });
+            }
+
+            // Auto-reset for next attempt
+            setTimeout(() => {
+                setStatus('IDLE');
+                setUsername('');
+                setChecks({
+                    length: false,
+                    chars: false,
+                    audit: false,
+                    unique: false
+                });
+            }, 2000);
+        }, 1500);
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && status !== 'SCANNING' && username) {
+            handleScan();
+        }
+    };
+
+
     return (
-        <div className="w-full max-w-sm bg-slate-900 border border-slate-700 p-0 rounded-xl shadow-2xl overflow-hidden">
-            <div className="bg-slate-800 p-6 border-b border-slate-700">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    <span className="text-2xl">👤</span> Create Username
-                </h3>
-                <p className="text-slate-400 text-xs mt-1">Claim your unique digital identity.</p>
+        <div className="w-full max-w-sm bg-surface border border-theme p-0 rounded-2xl shadow-3d overflow-hidden relative group transition-colors">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
+
+            {/* Header */}
+            <div className="relative p-6 border-b border-theme bg-surface/90 backdrop-blur transition-colors">
+                <div className="flex justify-between items-center mb-2">
+                    <User className="w-6 h-6 text-accent-secondary" />
+                    <div className="text-[10px] font-mono text-accent-secondary/70 animate-pulse">SYSTEM_READY</div>
+                </div>
+                <h3 className="text-lg font-bold text-primary-color tracking-tight">Identity Register</h3>
             </div>
 
-            <div className="p-6 space-y-6">
-                <form onSubmit={handleCheck} className="space-y-4">
-                    <div className="space-y-2">
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Username</label>
-                        <input
-                            type="text"
-                            className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono text-lg"
-                            placeholder="e.g. user_123"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                        <p className="text-xs text-slate-500">3-20 characters, alphanumeric only.</p>
+            <div className="relative p-6 space-y-6">
+                {/* Input Area */}
+                <div className="relative">
+                    <input
+                        type="text"
+                        className="w-full bg-body border-2 border-theme focus:border-accent-secondary rounded-xl px-4 py-4 text-primary-color placeholder-slate-400 focus:outline-none transition-all font-mono text-center tracking-widest uppercase"
+                        placeholder="ENTER_ID"
+                        value={username}
+                        onChange={handleInput}
+                        onKeyDown={handleKeyDown}
+                        disabled={status === 'SCANNING'}
+                    />
+                    {status === 'SCANNING' && (
+                        <div className="absolute inset-0 bg-accent-secondary/10 animate-pulse rounded-xl border-2 border-accent-secondary/50"></div>
+                    )}
+                </div>
+
+                {/* Live Checklist */}
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between text-xs text-secondary-color font-mono">
+                        <span>Length (3-20)</span>
+                        <div className={`w-2 h-2 rounded-full ${checks.length ? 'bg-accent-secondary shadow-[0_0_8px_#10b981]' : 'bg-slate-300 dark:bg-slate-700'}`} />
                     </div>
-                    <button
-                        type="submit"
-                        className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-lg transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 active:scale-[0.98]"
-                    >
-                        Check Availability
-                    </button>
-                </form>
+                    <div className="flex items-center justify-between text-xs text-secondary-color font-mono">
+                        <span>Alphanumeric Only</span>
+                        <div className={`w-2 h-2 rounded-full ${checks.chars ? 'bg-accent-secondary shadow-[0_0_8px_#10b981]' : 'bg-slate-300 dark:bg-slate-700'}`} />
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-secondary-color font-mono">
+                        <span>Restricted Terms</span>
+                        <div className={`w-2 h-2 rounded-full ${checks.audit ? 'bg-accent-secondary shadow-[0_0_8px_#10b981]' : 'bg-slate-300 dark:bg-slate-700'}`} />
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-secondary-color font-mono">
+                        <span>Availability</span>
+                        <div className={`w-2 h-2 rounded-full ${checks.unique ? 'bg-accent-secondary shadow-[0_0_8px_#10b981]' : 'bg-slate-300 dark:bg-slate-700'}`} />
+                    </div>
+                </div>
+
+                {/* Action Button */}
+                <button
+                    onClick={handleScan}
+                    disabled={status === 'SCANNING' || !username}
+                    className={`w-full py-4 rounded-xl font-bold tracking-widest uppercase transition-all relative overflow-hidden ${status === 'VALID' ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]' :
+                        status === 'INVALID' ? 'bg-red-600 text-white shadow-[0_0_20px_#dc2626]' :
+                            'bg-body border border-theme text-secondary-color hover:bg-slate-900 hover:text-white dark:hover:bg-slate-100 dark:hover:text-slate-900'
+                        }`}
+                >
+                    {status === 'SCANNING' ? 'VERIFYING...' :
+                        status === 'VALID' ? 'ACCESS GRANTED' :
+                            status === 'INVALID' ? 'ACCESS DENIED' : 'INITIATE SCAN'}
+
+                    {status === 'SCANNING' && (
+                        <div className="absolute bottom-0 left-0 h-1 bg-accent-secondary animate-[width_1.5s_ease-in-out_infinite]" style={{ width: '100%' }}></div>
+                    )}
+                </button>
             </div>
+
+            {/* Scanner Line */}
+            <div className="absolute top-0 w-full h-[2px] bg-emerald-500/30 blur-[1px] animate-[scan_3s_linear_infinite] pointer-events-none"></div>
         </div>
     );
 };

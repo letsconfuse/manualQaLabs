@@ -25,9 +25,24 @@ export const BookingConfig = {
 const BookingArchitect = ({ addLog }) => {
     const [checkIn, setCheckIn] = useState('');
     const [checkOut, setCheckOut] = useState('');
+    const [nights, setNights] = useState(0);
 
     const blackoutStart = new Date('2026-12-24');
     const blackoutEnd = new Date('2026-12-26');
+
+    // Real-time calculation for UI feedback
+    React.useEffect(() => {
+        if (checkIn && checkOut) {
+            const d1 = new Date(checkIn);
+            const d2 = new Date(checkOut);
+            if (!isNaN(d1) && !isNaN(d2)) {
+                const diff = (d2 - d1) / (1000 * 60 * 60 * 24);
+                setNights(Math.round(diff));
+            } else {
+                setNights(0);
+            }
+        }
+    }, [checkIn, checkOut]);
 
     const handleBooking = (e) => {
         e.preventDefault();
@@ -122,33 +137,32 @@ const BookingArchitect = ({ addLog }) => {
     };
 
     return (
-        <div className="w-full max-w-sm bg-slate-900 border border-slate-700 p-0 rounded-xl shadow-2xl overflow-hidden">
-            <div className="bg-slate-800 p-6 border-b border-slate-700">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    <span className="text-2xl">📅</span> Elite Booking Engine
-                </h3>
-                <p className="text-slate-400 text-xs mt-1">Reserve your stay... if time permits.</p>
+        <div className="w-full max-w-sm bg-surface border border-theme p-0 rounded-3xl shadow-xl dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden transition-colors relative font-serif">
+            {/* Elegant Header */}
+            <div className="bg-body p-8 text-center border-b border-theme transition-colors">
+                <div className="text-amber-600 dark:text-amber-500 font-bold tracking-[0.3em] text-[10px] uppercase mb-2">The Royal Suite</div>
+                <h3 className="text-3xl italic text-primary-color font-serif">Grand Hotel</h3>
+                <div className="w-16 h-[1px] bg-amber-500 dark:bg-amber-600 mx-auto mt-4"></div>
             </div>
 
-            <div className="p-6 space-y-6">
-                <p className="text-xs text-slate-500 font-mono text-center mb-2">*System Format: YYYY-MM-DD*</p>
-                <form onSubmit={handleBooking} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Check-in</label>
+            <div className="p-8 space-y-8 bg-surface transition-colors">
+                <form onSubmit={handleBooking} className="space-y-6">
+                    <div className="space-y-4">
+                        <div className="relative group">
+                            <label className="block text-[10px] font-bold text-amber-600/80 dark:text-amber-500/80 mb-1 uppercase tracking-wider pl-1">Arrival Date</label>
                             <input
                                 type="text"
-                                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
+                                className="w-full bg-transparent border-b border-slate-300 dark:border-slate-800 focus:border-amber-500 text-primary-color py-2 px-1 outline-none transition-all font-mono text-sm tracking-wider placeholder-secondary-color"
                                 placeholder="YYYY-MM-DD"
                                 value={checkIn}
                                 onChange={(e) => setCheckIn(e.target.value)}
                             />
                         </div>
-                        <div>
-                            <label className="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Check-out</label>
+                        <div className="relative group">
+                            <label className="block text-[10px] font-bold text-amber-600/80 dark:text-amber-500/80 mb-1 uppercase tracking-wider pl-1">Departure Date</label>
                             <input
                                 type="text"
-                                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
+                                className="w-full bg-transparent border-b border-slate-300 dark:border-slate-800 focus:border-amber-500 text-primary-color py-2 px-1 outline-none transition-all font-mono text-sm tracking-wider placeholder-secondary-color"
                                 placeholder="YYYY-MM-DD"
                                 value={checkOut}
                                 onChange={(e) => setCheckOut(e.target.value)}
@@ -156,30 +170,40 @@ const BookingArchitect = ({ addLog }) => {
                         </div>
                     </div>
 
-                    <div className="p-3 bg-slate-800/50 border border-slate-700/50 rounded-lg text-[10px] text-slate-400 italic flex gap-2 items-center">
-                        <span className="text-lg">⚠️</span>
-                        Developer Note: Maintenance scheduled for Dec 24-26, 2026.
+                    {/* Dynamic Cost Preview */}
+                    <div className="flex justify-between items-center py-4 border-t border-theme transition-colors">
+                        <div className="text-left">
+                            <div className="text-[10px] text-secondary-color uppercase tracking-wider">Duration</div>
+                            <div className={`text-xl font-mono ${nights < 0 ? 'text-red-500' : 'text-primary-color'}`}>
+                                {nights} <span className="text-xs text-secondary-color">Nights</span>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-[10px] text-secondary-color uppercase tracking-wider">Total Est.</div>
+                            <div className="text-xl font-mono text-amber-600 dark:text-amber-500">
+                                ${(Math.max(0, nights) * 450).toLocaleString()}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="p-3 bg-amber-500/5 border border-amber-500/20 text-[10px] text-amber-800 dark:text-amber-500 italic text-center transition-colors rounded-xl">
+                        *Blackout dates apply: Dec 24-26
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full bg-slate-100 hover:bg-white text-slate-900 font-bold py-3 rounded-lg transition-all uppercase tracking-widest text-xs shadow-lg shadow-white/5 active:scale-[0.98]"
+                        className="w-full bg-amber-500 hover:bg-amber-400 dark:bg-amber-600 dark:hover:bg-amber-500 text-white font-bold py-4 rounded-xl transition-all uppercase tracking-[0.2em] text-xs shadow-lg active:scale-[0.99]"
                     >
-                        Confirm Reservation
+                        Reserve
                     </button>
                 </form>
-
-                <div className="pt-4 border-t border-slate-800 flex justify-around opacity-50">
-                    <div className="text-center">
-                        <span className="block font-bold text-xs text-slate-500">Total</span>
-                        <span className="text-xs text-indigo-400 font-mono">$ --</span>
-                    </div>
-                    <div className="text-center">
-                        <span className="block font-bold text-xs text-slate-500">Tax</span>
-                        <span className="text-xs text-indigo-400 font-mono">$ --</span>
-                    </div>
-                </div>
             </div>
+
+            {/* Decorative corners */}
+            <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-amber-500/30 dark:border-amber-800/50 pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-amber-500/30 dark:border-amber-800/50 pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-amber-500/30 dark:border-amber-800/50 pointer-events-none"></div>
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-amber-500/30 dark:border-amber-800/50 pointer-events-none"></div>
         </div>
     );
 };

@@ -28,6 +28,10 @@ const SubscriptionNexus = ({ addLog }) => {
     const [unitInput, setUnitInput] = useState('0');
     const [discountAmount, setDiscountAmount] = useState(0);
 
+    // New: Debug Mode State
+    const [debugMode, setDebugMode] = useState(false);
+    const [glitchIntensity, setGlitchIntensity] = useState(0);
+
     // -------------------------------------------------------------------------
     // "THE BEAST" - Financial Logic Engine (Intentionally Flawed)
     // -------------------------------------------------------------------------
@@ -88,7 +92,8 @@ const SubscriptionNexus = ({ addLog }) => {
             tax,
             createdDate: currentDate,
             total,
-            precisionRaw: totalBeforeDiscount // Exposed for checking the float bug
+            precisionRaw: totalBeforeDiscount, // Exposed for checking the float bug
+            debug: { taxableBase, exemptBase, adjustedTaxable, adjustedExempt }
         };
     }, [plan, addons, unitInput, unitPrice, discountAmount, currentDate]);
 
@@ -101,6 +106,9 @@ const SubscriptionNexus = ({ addLog }) => {
         const rawString = invoice.precisionRaw.toFixed(20); // Expand to see the drift
         if (rawString.includes('000000000001') || rawString.includes('99999999999')) {
             addLog({ type: 'success', message: `BEAST FOUND: Floating point drift detected in ledger ($${invoice.precisionRaw})`, edgeCaseId: 'floating-point-drift' });
+            setGlitchIntensity(1);
+        } else {
+            setGlitchIntensity(0);
         }
 
         // Elite Case 5: Orphaned Add-on
@@ -157,73 +165,79 @@ const SubscriptionNexus = ({ addLog }) => {
     // -------------------------------------------------------------------------
 
     return (
-        <div className="w-full max-w-7xl mx-auto h-full min-h-[600px] bg-[#0f172a] rounded-3xl shadow-xl overflow-hidden flex flex-col font-sans border border-slate-800 relative">
+        <div className="w-full max-w-7xl mx-auto h-full min-h-[600px] bg-surface rounded-3xl shadow-3d overflow-hidden flex flex-col font-sans border border-theme relative transition-colors">
             {/* Scroll Hint for small screens */}
-            <div className="absolute top-4 right-4 z-20 lg:hidden bg-slate-800/80 backdrop-blur text-slate-400 text-[10px] px-2 py-1 rounded-full border border-slate-700 pointer-events-none animate-pulse">
+            <div className="absolute top-4 right-4 z-20 lg:hidden bg-surface backdrop-blur text-secondary-color text-[10px] px-2 py-1 rounded-full border border-theme pointer-events-none animate-pulse">
                 Scroll ➡️
             </div>
             <div className="flex-1 overflow-x-auto overflow-y-hidden custom-scrollbar">
                 <div className="h-full flex min-w-[1024px]">
 
                     {/* 1. SIDEBAR NAVIGATION */}
-                    <aside className="w-64 shrink-0 bg-slate-900/50 backdrop-blur-xl border-r border-slate-800 flex flex-col p-4">
-                        <div className="flex items-center gap-3 mb-6 text-emerald-400">
+                    <aside className="w-64 shrink-0 bg-surface backdrop-blur-xl border-r border-theme flex flex-col p-4 transition-colors">
+                        <div className="flex items-center gap-3 mb-6 text-emerald-600 dark:text-emerald-400">
                             <Database className="w-6 h-6" />
-                            <span className="font-bold tracking-wider text-sm">BILLING<span className="text-slate-400">OS</span></span>
+                            <span className="font-bold tracking-wider text-sm text-primary-color">BILLING<span className="text-secondary-color">OS</span></span>
                         </div>
 
                         <div className="space-y-4 flex-1">
                             <div className="space-y-2">
-                                <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tenant</label>
-                                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
-                                    <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+                                <label className="text-[10px] uppercase font-bold text-secondary-color tracking-wider">Tenant</label>
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-body border border-theme">
+                                    <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-500 dark:text-indigo-400">
                                         <Activity className="w-4 h-4" />
                                     </div>
                                     <div>
-                                        <div className="text-xs font-medium text-slate-200">Acme Corp</div>
-                                        <div className="text-[10px] text-slate-400">ID: 992-882-11</div>
+                                        <div className="text-xs font-medium text-primary-color">Acme Corp</div>
+                                        <div className="text-[10px] text-secondary-color">ID: 992-882-11</div>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">System Date</label>
+                                <label className="text-[10px] uppercase font-bold text-secondary-color tracking-wider">System Date</label>
                                 <div className="relative">
                                     <input
                                         type="text"
                                         value={currentDate}
                                         onChange={(e) => setCurrentDate(e.target.value)}
-                                        className="w-full bg-slate-950/50 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-emerald-400 outline-none focus:border-emerald-500/50 transition-all pl-9"
+                                        className="w-full bg-body border border-theme rounded-lg px-3 py-2 text-xs font-mono text-emerald-600 dark:text-emerald-400 outline-none focus:border-emerald-500/50 transition-all pl-9"
                                     />
-                                    <Calendar className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+                                    <Calendar className="w-3.5 h-3.5 text-secondary-color absolute left-3 top-2.5" />
                                 </div>
                             </div>
 
-                            <div className="pt-6 border-t border-slate-800">
-                                <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-2 block">Account Status</label>
-                                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold border ${status === 'Lapsed' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>
+                            <div className="pt-6 border-t border-theme">
+                                <label className="text-[10px] uppercase font-bold text-secondary-color tracking-wider mb-2 block">Account Status</label>
+                                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold border ${status === 'Lapsed' ? 'bg-red-500/10 text-red-500 dark:text-red-400 border-red-500/20' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'}`}>
                                     <div className={`w-1.5 h-1.5 rounded-full ${status === 'Lapsed' ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`} />
                                     {status.toUpperCase()}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="text-[10px] text-slate-500 font-mono text-center">
-                            v4.2.1-stable
+                        <div className="text-[10px] text-secondary-color font-mono text-center flex flex-col gap-2">
+                            <span>v4.2.1-stable</span>
+                            <button
+                                onClick={() => setDebugMode(!debugMode)}
+                                className={`text-[9px] uppercase tracking-widest hover:text-primary-color transition-colors ${debugMode ? 'text-indigo-500 font-bold' : 'opacity-30'}`}
+                            >
+                                {debugMode ? 'Debug: ON' : 'Debug: OFF'}
+                            </button>
                         </div>
                     </aside>
 
                     {/* 2. MAIN WORKSPACE */}
-                    <main className="flex-1 bg-slate-900/30 p-5 overflow-y-auto custom-scrollbar">
+                    <main className="flex-1 bg-body p-5 overflow-y-auto custom-scrollbar transition-colors">
                         <header className="mb-5 flex justify-between items-center">
                             <div>
-                                <h2 className="text-2xl font-light text-white mb-1">Subscription Overview</h2>
-                                <p className="text-xs text-slate-400">Manage plan tiers, addons, and billing cycles.</p>
+                                <h2 className="text-2xl font-light text-primary-color mb-1">Subscription Overview</h2>
+                                <p className="text-xs text-secondary-color">Manage plan tiers, addons, and billing cycles.</p>
                             </div>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setStatus(status === 'Active' ? 'Lapsed' : 'Active')}
-                                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-xs font-medium transition-all"
+                                    className="bg-surface hover-bg-surface text-secondary-color px-4 py-2 rounded-lg text-xs font-medium transition-all shadow-sm border border-theme"
                                 >
                                     Toggle Status
                                 </button>
@@ -232,7 +246,7 @@ const SubscriptionNexus = ({ addLog }) => {
 
                         {/* Plan Selection */}
                         <section className="mb-6">
-                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Core Plan</h3>
+                            <h3 className="text-xs font-bold text-secondary-color uppercase tracking-wider mb-4">Core Plan</h3>
                             <div className="grid grid-cols-3 gap-4">
                                 {['Basic', 'Pro', 'Enterprise'].map(p => {
                                     const isSelected = plan === p;
@@ -241,19 +255,19 @@ const SubscriptionNexus = ({ addLog }) => {
                                             key={p}
                                             onClick={() => handleUpgrade(p)}
                                             className={`relative p-4 rounded-2xl border text-left transition-all duration-300 group ${isSelected
-                                                ? 'bg-indigo-600/10 border-indigo-500/50 shadow-[0_0_20px_rgba(99,102,241,0.1)]'
-                                                : 'bg-slate-800/20 border-slate-700/50 hover:bg-slate-800/40'}`}
+                                                ? 'bg-indigo-500/10 border-indigo-500/50 shadow-[0_0_20px_rgba(99,102,241,0.1)]'
+                                                : 'bg-surface border-theme hover:border-accent-primary/50'}`}
                                         >
                                             {isSelected && <div className="absolute top-3 right-3 w-2 h-2 bg-indigo-400 rounded-full shadow-[0_0_10px_#818cf8]" />}
-                                            <h4 className={`text-sm font-medium mb-1 ${isSelected ? 'text-white' : 'text-slate-300'}`}>{p}</h4>
-                                            <div className="text-2xl font-light text-slate-200 mb-4">
+                                            <h4 className={`text-sm font-medium mb-1 ${isSelected ? 'text-primary-color' : 'text-secondary-color'}`}>{p}</h4>
+                                            <div className="text-2xl font-light text-primary-color mb-4">
                                                 ${p === 'Enterprise' ? '500' : p === 'Pro' ? '100' : '20'}
-                                                <span className="text-xs text-slate-400 font-normal">/mo</span>
+                                                <span className="text-xs text-secondary-color font-normal">/mo</span>
                                             </div>
                                             <ul className="space-y-1">
                                                 {[1, 2].map(i => (
-                                                    <li key={i} className="flex items-center gap-2 text-[10px] text-slate-400">
-                                                        <div className={`w-1 h-1 rounded-full ${isSelected ? 'bg-indigo-500' : 'bg-slate-600'}`} />
+                                                    <li key={i} className="flex items-center gap-2 text-[10px] text-secondary-color">
+                                                        <div className={`w-1 h-1 rounded-full ${isSelected ? 'bg-indigo-500' : 'bg-slate-400'}`} />
                                                         Feature inclusion {i}
                                                     </li>
                                                 ))}
@@ -266,19 +280,19 @@ const SubscriptionNexus = ({ addLog }) => {
 
                         {/* Addons */}
                         <section className="mb-6">
-                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Expansion Modules</h3>
+                            <h3 className="text-xs font-bold text-secondary-color uppercase tracking-wider mb-4">Expansion Modules</h3>
                             <div className="grid grid-cols-1 gap-3">
                                 {addons.map(addon => (
-                                    <div key={addon.id} className="flex items-center justify-between p-4 rounded-xl bg-slate-800/20 border border-slate-700/30 hover:border-slate-600/50 transition-all">
+                                    <div key={addon.id} className="flex items-center justify-between p-4 rounded-xl bg-surface border border-theme hover:border-accent-primary/50 transition-all">
                                         <div className="flex items-center gap-4">
-                                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${addon.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-600'}`}>
+                                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${addon.active ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-body text-secondary-color'}`}>
                                                 <addon.icon className="w-5 h-5" />
                                             </div>
                                             <div>
-                                                <div className="text-sm font-medium text-slate-200">{addon.name}</div>
+                                                <div className="text-sm font-medium text-primary-color">{addon.name}</div>
                                                 <div className="flex items-center gap-2 mt-0.5">
-                                                    <span className="text-xs text-slate-400">${addon.price}/mo</span>
-                                                    <span className={`text-[9px] px-1.5 py-0.5 rounded border ${addon.type === 'taxable' ? 'border-orange-500/30 text-orange-400' : 'border-blue-500/30 text-blue-400'}`}>
+                                                    <span className="text-xs text-secondary-color">${addon.price}/mo</span>
+                                                    <span className={`text-[9px] px-1.5 py-0.5 rounded border ${addon.type === 'taxable' ? 'border-orange-500/30 text-orange-600 dark:text-orange-400' : 'border-blue-500/30 text-blue-600 dark:text-blue-400'}`}>
                                                         {addon.type.toUpperCase()}
                                                     </span>
                                                 </div>
@@ -287,8 +301,8 @@ const SubscriptionNexus = ({ addLog }) => {
                                         <button
                                             onClick={() => setAddons(prev => prev.map(a => a.id === addon.id ? { ...a, active: !a.active } : a))}
                                             className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${addon.active
-                                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20'
-                                                : 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-white'
+                                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20'
+                                                : 'bg-body text-secondary-color border border-theme hover:text-primary-color hover:bg-surface'
                                                 }`}
                                         >
                                             {addon.active ? 'ACTIVE' : 'ADD'}
@@ -300,19 +314,19 @@ const SubscriptionNexus = ({ addLog }) => {
 
                         {/* Metered Usage */}
                         <section className="mb-6">
-                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Usage Metering</h3>
-                            <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-800/30 to-slate-900/30 border border-slate-700/30">
+                            <h3 className="text-xs font-bold text-secondary-color uppercase tracking-wider mb-4">Usage Metering</h3>
+                            <div className="p-6 rounded-2xl bg-surface border border-theme">
                                 <div className="flex justify-between items-end mb-4">
                                     <div>
-                                        <div className="text-sm text-slate-300 font-medium mb-1">API Calls</div>
-                                        <div className="text-xs text-slate-400">Rate: ${unitPrice} per call</div>
+                                        <div className="text-sm text-primary-color font-medium mb-1">API Calls</div>
+                                        <div className="text-xs text-secondary-color">Rate: ${unitPrice} per call</div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-2xl font-mono text-white tracking-tight">{unitInput}</div>
-                                        <div className="text-[10px] text-slate-400 text-right">UNITS</div>
+                                        <div className="text-2xl font-mono text-primary-color tracking-tight">{unitInput}</div>
+                                        <div className="text-[10px] text-secondary-color text-right">UNITS</div>
                                     </div>
                                 </div>
-                                <div className="relative h-2 bg-slate-800 rounded-full overflow-hidden mb-4">
+                                <div className="relative h-2 bg-body rounded-full overflow-hidden mb-4">
                                     <div
                                         className="absolute top-0 left-0 h-full bg-indigo-500 transition-all duration-500"
                                         style={{ width: `${Math.min(100, (parseInt(unitInput) / 10000))}%` }}
@@ -322,25 +336,25 @@ const SubscriptionNexus = ({ addLog }) => {
                                     type="text"
                                     value={unitInput}
                                     onChange={(e) => setUnitInput(e.target.value)}
-                                    className="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-4 py-3 text-sm text-white outline-none focus:border-indigo-500/50 transition-all font-mono"
+                                    className="w-full bg-body border border-theme rounded-lg px-4 py-3 text-sm text-primary-color outline-none focus:border-indigo-500/50 transition-all font-mono"
                                     placeholder="Enter usage count..."
                                 />
                             </div>
                         </section>
 
                         {/* Danger Zone */}
-                        <section className="pt-6 border-t border-slate-800/50 flex gap-4">
+                        <section className="pt-6 border-t border-theme flex gap-4">
                             <button
                                 onClick={applyGlobalDiscount}
-                                className="flex-1 py-3 bg-slate-800/50 hover:bg-slate-800 text-slate-300 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-slate-700/50 hover:border-slate-600 flex items-center justify-center gap-2"
+                                className="flex-1 py-3 bg-surface hover-bg-surface text-secondary-color rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-theme hover:border-slate-400 flex items-center justify-center gap-2"
                             >
                                 <Zap className="w-4 h-4 text-yellow-500" /> Apply Retention Offer
                             </button>
                             <button
                                 onClick={handleCancellation}
                                 className={`flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border flex items-center justify-center gap-2 ${status === 'Lapsed'
-                                    ? 'bg-red-900/10 text-red-500/50 border-red-900/20 cursor-not-allowed opacity-50'
-                                    : 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/20'
+                                    ? 'bg-red-500/5 text-red-500/50 border-red-500/10 cursor-not-allowed opacity-50'
+                                    : 'bg-red-500/10 hover:bg-red-500/20 text-red-500 dark:text-red-400 border-red-500/20'
                                     }`}
                                 title={status === 'Lapsed' ? 'Cannot cancel while lapsed' : 'Cancel Subscription'}
                             >
@@ -350,22 +364,22 @@ const SubscriptionNexus = ({ addLog }) => {
                     </main>
 
                     {/* 3. INVOICE PREVIEW */}
-                    <aside className="w-80 shrink-0 bg-white text-slate-900 p-5 flex flex-col relative">
+                    <aside className="w-80 shrink-0 bg-surface text-primary-color p-5 flex flex-col relative transition-colors border-l border-theme">
                         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
 
                         <header className="mb-5 flex justify-between items-start">
                             <div>
                                 <h1 className="text-xl font-black tracking-tight mb-1">INVOICE</h1>
-                                <div className="text-[10px] text-slate-500 font-mono">#INV-2026-001</div>
+                                <div className="text-[10px] text-secondary-color font-mono">#INV-2026-001</div>
                             </div>
-                            <div className="w-8 h-8 rounded bg-slate-900 text-white flex items-center justify-center">
-                                <Zap className="w-4 h-4" />
+                            <div className="w-8 h-8 rounded bg-primary-color text-surface flex items-center justify-center">
+                                <Zap className="w-4 h-4 text-body" />
                             </div>
                         </header>
 
                         <div className="flex-1 overflow-y-auto">
                             <div className="space-y-3 text-xs">
-                                <div className="flex justify-between border-b pb-2 mb-2 font-bold text-slate-500 uppercase tracking-wider text-[10px]">
+                                <div className="flex justify-between border-b border-theme pb-2 mb-2 font-bold text-secondary-color uppercase tracking-wider text-[10px]">
                                     <span>Item</span>
                                     <span>Cost</span>
                                 </div>
@@ -379,49 +393,71 @@ const SubscriptionNexus = ({ addLog }) => {
                                 )}
 
                                 {invoice.activeAddons.map(a => (
-                                    <div key={a.id} className="flex justify-between text-slate-600">
+                                    <div key={a.id} className="flex justify-between text-secondary-color">
                                         <span>{a.name}</span>
                                         <span>${a.price.toFixed(2)}</span>
                                     </div>
                                 ))}
 
                                 {parseFloat(unitInput || 0) > 0 && (
-                                    <div className="flex justify-between text-slate-600">
+                                    <div className="flex justify-between text-secondary-color">
                                         <span>Usage ({unitInput})</span>
                                         <span>${invoice.usageCost.toFixed(2)}</span>
                                     </div>
                                 )}
 
                                 {discountAmount > 0 && (
-                                    <div className="flex justify-between text-emerald-600 font-bold">
+                                    <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
                                         <span>Discount</span>
                                         <span>-${discountAmount.toFixed(2)}</span>
                                     </div>
                                 )}
 
                                 {/* Summary Block */}
-                                <div className="border-t-2 border-slate-900 pt-4 mt-4 space-y-2">
-                                    <div className="flex justify-between text-slate-500">
+                                <div className="border-t-2 border-primary-color pt-4 mt-4 space-y-2 relative">
+                                    <div className="flex justify-between text-secondary-color">
                                         <span>Subtotal</span>
                                         <span>${invoice.subtotal.toFixed(2)}</span>
                                     </div>
-                                    <div className="flex justify-between text-slate-500">
+                                    <div className="flex justify-between text-secondary-color">
                                         <span>Tax (10%)</span>
                                         <span>${invoice.tax.toFixed(2)}</span>
                                     </div>
-                                    <div className="flex justify-between text-lg font-black pt-2">
+                                    <div className={`flex justify-between text-lg font-black pt-2 transition-all duration-75 ${glitchIntensity > 0 ? 'text-red-500 translate-x-[1px]' : ''
+                                        }`}
+                                        style={{
+                                            textShadow: glitchIntensity > 0 ? '2px 0 red, -2px 0 blue' : 'none',
+                                            transform: glitchIntensity > 0 ? `translate(${Math.random() * 2 - 1}px, ${Math.random() * 2 - 1}px)` : 'none'
+                                        }}
+                                    >
                                         <span>Total</span>
                                         <span>${invoice.total.toFixed(2)}</span>
                                     </div>
+                                    {glitchIntensity > 0 && <div className="text-[9px] text-red-500 font-mono text-right mt-1">⚠ PRECISION LOSS</div>}
                                 </div>
+
+                                {/* DEBUG PANEL (Conditional) */}
+                                {debugMode && (
+                                    <div className="mt-4 p-3 bg-body rounded text-[9px] font-mono text-accent-secondary overflow-hidden relative transition-colors">
+                                        <div className="absolute top-0 right-0 p-1 opacity-50">HEADLESS_LOG</div>
+                                        <div className="space-y-1">
+                                            <div className="flex justify-between"><span>RAW_TOTAL:</span> <span>{invoice.precisionRaw.toFixed(10)}...</span></div>
+                                            <div className="h-px bg-green-900/50 my-1" />
+                                            <div className="flex justify-between text-secondary-color"><span>TAXABLE_BASE:</span> <span>{invoice.debug.taxableBase.toFixed(2)}</span></div>
+                                            <div className="flex justify-between text-secondary-color"><span>EXEMPT_BASE:</span> <span>{invoice.debug.exemptBase.toFixed(2)}</span></div>
+                                            <div className="flex justify-between text-yellow-500"><span>ADJ_TAXABLE:</span> <span>{invoice.debug.adjustedTaxable.toFixed(2)}</span></div>
+                                            <div className="flex justify-between text-yellow-500"><span>ADJ_EXEMPT:</span> <span>{invoice.debug.adjustedExempt.toFixed(2)}</span></div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
-                        <footer className="mt-4 pt-4 border-t border-slate-100">
-                            <button className="w-full py-3 bg-slate-900 text-white rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-slate-800 transition-all flex items-center justify-center gap-2">
-                                <Download className="w-4 h-4" /> Download PDF
+                        <footer className="mt-4 pt-4 border-t border-theme">
+                            <button className="w-full py-3 bg-primary-color text-surface rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-opacity-90 transition-all flex items-center justify-center gap-2">
+                                <Download className="w-4 h-4 text-body" /> Download PDF
                             </button>
-                            <p className="text-[9px] text-center text-slate-500 mt-4 leading-normal">
+                            <p className="text-[9px] text-center text-secondary-color mt-4 leading-normal">
                                 Payment due within 30 days. Late fees apply for amounts over $1,000.
                             </p>
                         </footer>
