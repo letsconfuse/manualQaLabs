@@ -6,6 +6,7 @@ import CouponCode, { CouponConfig } from '../scenarios/CouponCode';
 import RoleManager, { RoleConfig } from '../scenarios/RoleManager';
 import BookingArchitect, { BookingConfig } from '../scenarios/BookingArchitect';
 import SubscriptionNexus from '../scenarios/SubscriptionNexus';
+import LoginForm, { LoginFormConfig } from '../scenarios/LoginForm';
 
 const SubscriptionConfig = {
     id: 'subscription-nexus',
@@ -62,6 +63,10 @@ export const challengeRegistry = {
     'subscription-nexus': {
         component: SubscriptionNexus,
         config: SubscriptionConfig,
+    },
+    'login-form': {
+        component: LoginForm,
+        config: LoginFormConfig,
     }
 };
 
