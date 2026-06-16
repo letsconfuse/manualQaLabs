@@ -74,11 +74,14 @@ const ChallengeRunner = ({
             {/* LEFT PANE: Interactive App Stage */}
             <div className="flex-grow h-full relative overflow-auto flex flex-col">
                 {/* Header / Breadcrumbs */}
-                <div className="flex-shrink-0 h-14 border-b border-theme flex items-center px-6 bg-surface">
+                <div className="flex-shrink-0 border-b border-theme flex flex-col justify-center px-6 py-2.5 bg-surface min-h-14">
                     <div className="flex items-center gap-3">
-                        <Link to="/challenges" className="text-secondary-color hover:text-primary-color text-xs uppercase tracking-wider font-bold transition-colors">&larr; Back</Link>
-                        <div className="w-px h-4 bg-theme"></div>
-                        <h2 className="text-sm font-bold text-primary-color">{title}</h2>
+                        <Link to="/challenges" className="text-secondary-color hover:text-primary-color text-xs uppercase tracking-wider font-bold transition-colors flex-shrink-0">&larr; Back</Link>
+                        <div className="w-px h-4 bg-theme flex-shrink-0"></div>
+                        <div className="min-w-0">
+                            <h2 className="text-sm font-bold text-primary-color leading-tight">{title}</h2>
+                            {description && <p className="text-[11px] text-secondary-color mt-0.5 leading-relaxed">{description}</p>}
+                        </div>
                     </div>
                 </div>
 
